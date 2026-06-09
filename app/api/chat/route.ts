@@ -98,6 +98,10 @@ const PROVIDERS: Record<Provider, ProviderConfig> = {
     envKey: "DEEPSEEK_API_KEY",
     run: async (args) => (await openAICompatible("https://api.deepseek.com"))(args),
   },
+  perplexity: {
+    envKey: "PERPLEXITY_API_KEY",
+    run: async (args) => (await openAICompatible("https://api.perplexity.ai"))(args),
+  },
   gemini: {
     envKey: "GEMINI_API_KEY",
     run: async ({ apiKey, model, system, messages, maxTokens }) => {

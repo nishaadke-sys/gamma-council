@@ -1,6 +1,6 @@
-export type AgentId = "analyst" | "advocate" | "strategist" | "realist" | "contrarian"
+export type AgentId = "analyst" | "advocate" | "strategist" | "realist" | "contrarian" | "researcher"
 export type ModeId = "decision" | "market" | "strategy" | "stress-test"
-export type Provider = "anthropic" | "openai" | "gemini" | "xai" | "deepseek"
+export type Provider = "anthropic" | "openai" | "gemini" | "xai" | "deepseek" | "perplexity" | "perplexity" | "perplexity"
 
 export interface Agent {
   id: AgentId
@@ -87,7 +87,18 @@ export const AGENTS: Agent[] = [
     systemPrompt:
       "You are the Contrarian on the Gamma Council. When the council drifts toward consensus, argue the opposite to surface what everyone is missing. Look for the non-obvious framing, the overlooked option, and the assumption nobody questioned. Be provocative but grounded. Your goal is to widen the option space, not to be needlessly difficult.",
   },
-]
+{
+    id: "researcher",
+    name: "Researcher",
+    llm: "Perplexity",
+    provider: "perplexity",
+    model: "llama-3.1-sonar-large-128k-online",
+    role: "Live web research",
+    blurb: "Searches the live web to ground the debate in current verified facts.",
+    color: "researcher",
+    systemPrompt:
+      "You are the Researcher on the Gamma Council. You go first in every round. Search the web for current, verified facts relevant to the question. Surface real data points, recent developments, and cite what you find. The other agents will build their arguments on your findings. Be factual, concise, and specific.",
+  },]
 
 export const MODES: Mode[] = [
   {
@@ -143,3 +154,5 @@ export function getAgent(id: AgentId): Agent {
 export function getMode(id: ModeId): Mode {
   return MODES.find((m) => m.id === id) as Mode
 }
+
+// Perplexity agent injected post-build

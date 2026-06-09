@@ -181,7 +181,7 @@ export function useDebate() {
         const data = await res.json()
         if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status}).`)
 
-        const text = (data.text || "(no response)").replace(/--/g, "-").replace(/\u2014/g, "-")
+        const text = (data.text || "(no response)").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-").replace(/ - /g, " - ")
         working[i] = { ...turn, content: text, status: "done" }
 
         const tokenEstimate = (system.length + userMessage.length + text.length) / 4
@@ -235,7 +235,7 @@ export function useDebate() {
           }),
         })
         const data = await res.json()
-        const verdictText = (data.text || "").replace(/--/g, "-").replace(/\u2014/g, "-")
+        const verdictText = (data.text || "").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-")
         setTurns((prev) =>
           prev.map((t) =>
             t.id === verdictTurn.id ? { ...t, content: verdictText, status: "done" } : t,

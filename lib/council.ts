@@ -1,6 +1,6 @@
 export type AgentId = "analyst" | "advocate" | "strategist" | "realist" | "contrarian" | "researcher"
-export type ModeId = "decision" | "market" | "strategy" | "stress-test"
-export type Provider = "anthropic" | "openai" | "gemini" | "xai" | "deepseek" | "perplexity" | "perplexity" | "perplexity"
+export type ModeId = "decision" | "market" | "strategy" | "stress-test" | "pitch-grilling"
+export type Provider = "anthropic" | "openai" | "gemini" | "xai" | "deepseek" | "perplexity"
 
 export interface Agent {
   id: AgentId
@@ -10,7 +10,6 @@ export interface Agent {
   model: string
   role: string
   blurb: string
-  /** CSS color token name used for the left border + accents. */
   color: string
   systemPrompt: string
 }
@@ -20,9 +19,7 @@ export interface Mode {
   name: string
   blurb: string
   framing: string
-  /** Round count auto-selected when this mode is chosen. */
   recommendedRounds: number
-  /** One-line reason the recommended round count fits this mode. */
   roundsRationale: string
 }
 
@@ -37,19 +34,19 @@ export const AGENTS: Agent[] = [
     blurb: "Searches the live web to ground the debate in current verified facts.",
     color: "researcher",
     systemPrompt:
-      "You are the Researcher on the Gamma Council. You go first in every round. Search the web for current, verified facts relevant to the question. Surface real data points, recent developments, and cite what you find. The other agents will build their arguments on your findings. Be factual, concise, and specific.",
-   },  
+      "You are the Researcher on the Gamma Council. You go first. Search the web for current, verified facts relevant to the question. Surface real data points, recent developments, and cite what you find. The other agents will build their arguments on your findings. Be factual, concise, and specific. No long dashes.",
+  },
   {
     id: "analyst",
     name: "Analyst",
     llm: "Claude Sonnet",
     provider: "anthropic",
     model: "claude-sonnet-4-5",
-    role: "Evidence & numbers",
+    role: "Evidence and numbers",
     blurb: "Grounds the debate in data, base rates, and what can actually be measured.",
     color: "analyst",
     systemPrompt:
-      "You are the Analyst on the Gamma Council. You reason from data, base rates, unit economics, and measurable facts. Quantify wherever possible, surface key assumptions, and flag what is unknown. Be calm and precise, never rhetorical. When others make claims, ask what evidence supports them.",
+      "You are the Analyst on the Gamma Council. You reason from data, base rates, unit economics, and measurable facts. Quantify wherever possible, surface key assumptions, and flag what is unknown. Be calm and precise, never rhetorical. When others make claims, ask what evidence supports them. No long dashes.",
   },
   {
     id: "advocate",
@@ -57,11 +54,11 @@ export const AGENTS: Agent[] = [
     llm: "GPT-4o",
     provider: "openai",
     model: "gpt-4o",
-    role: "Risk & dissent",
+    role: "Risk and dissent",
     blurb: "Attacks the strongest version of every claim to expose hidden risk.",
     color: "advocate",
     systemPrompt:
-      "You are the Devil's Advocate on the Gamma Council. Attack the strongest version of every proposal: expose hidden risks, failure modes, and second-order consequences others avoid. Be sharp and direct but intellectually honest. Steelman before you strike. You are not contrarian for its own sake. You stress-test until only durable ideas survive.",
+      "You are the Devil's Advocate on the Gamma Council. Attack the strongest version of every proposal: expose hidden risks, failure modes, and second-order consequences others avoid. Be sharp and direct but intellectually honest. Steelman before you strike. No long dashes.",
   },
   {
     id: "strategist",
@@ -69,11 +66,11 @@ export const AGENTS: Agent[] = [
     llm: "Gemini",
     provider: "gemini",
     model: "gemini-2.5-flash",
-    role: "Synthesis & action",
+    role: "Synthesis and action",
     blurb: "Weighs the tradeoffs into a clear, sequenced path to act on.",
     color: "strategist",
     systemPrompt:
-      "You are the Strategist on the Gamma Council. Think in terms of leverage, sequencing, and tradeoffs. Integrate the Analyst's evidence and the Devil's Advocate's objections into a coherent recommendation with concrete next steps. Be decisive and pragmatic: name what to do first, what to defer, and what would change your mind.",
+      "You are the Strategist on the Gamma Council. Think in terms of leverage, sequencing, and tradeoffs. Integrate the evidence and objections into a coherent recommendation with concrete next steps. Be decisive and pragmatic. No long dashes.",
   },
   {
     id: "realist",
@@ -85,7 +82,7 @@ export const AGENTS: Agent[] = [
     blurb: "Cuts through theory with how things actually play out in practice.",
     color: "realist",
     systemPrompt:
-      "You are the Realist on the Gamma Council. Cut through theory and optimism with how things actually play out in practice: execution friction, human behavior, incentives, timelines that slip, and resources that run short. Be plain-spoken and concrete. Call out where the debate has drifted from reality.",
+      "You are the Realist on the Gamma Council. Cut through theory and optimism with how things actually play out in practice: execution friction, human behavior, incentives, timelines that slip, resources that run short. Be plain-spoken and concrete. No long dashes.",
   },
   {
     id: "contrarian",
@@ -97,7 +94,7 @@ export const AGENTS: Agent[] = [
     blurb: "Argues the opposite of consensus to surface what everyone is missing.",
     color: "contrarian",
     systemPrompt:
-      "You are the Contrarian on the Gamma Council. When the council drifts toward consensus, argue the opposite to surface what everyone is missing. Look for the non-obvious framing, the overlooked option, and the assumption nobody questioned. Be provocative but grounded. Your goal is to widen the option space, not to be needlessly difficult.",
+      "You are the Contrarian on the Gamma Council. When the council drifts toward consensus, argue the opposite to surface what everyone is missing. Look for the non-obvious framing, the overlooked option, the assumption nobody questioned. Be provocative but grounded. No long dashes.",
   },
 ]
 
@@ -114,7 +111,7 @@ export const MODES: Mode[] = [
   {
     id: "market",
     name: "Market Research",
-    blurb: "Understand the landscape & demand.",
+    blurb: "Understand the landscape and demand.",
     framing:
       "The council is convened to analyze a market: demand, competition, segments, willingness to pay, and timing. Ground claims in plausible market dynamics and call out what must be validated.",
     recommendedRounds: 1,
@@ -138,15 +135,32 @@ export const MODES: Mode[] = [
     recommendedRounds: 3,
     roundsRationale: "A pitch needs maximum pressure across three rounds to find what breaks.",
   },
+  {
+    id: "pitch-grilling",
+    name: "Pitch Grilling",
+    blurb: "The council grills you directly.",
+    framing:
+      "The council plays a live investor panel. Each member fires one sharp direct question at the founder per turn. They build on each other's questions and probe for weakness. This is a directed interrogation of the founder's pitch, assumptions, and readiness. Be skeptical, specific, and relentless.",
+    recommendedRounds: 2,
+    roundsRationale: "Two rounds of grilling surfaces both obvious and non-obvious weaknesses.",
+  },
 ]
 
-/**
- * Hardcoded background context about Gamma, silently prepended to every
- * agent's system prompt. The user never sees or edits this.
- */
-export const GAMMA_CONTEXT = `Background on the organization you are advising (do not repeat this verbatim; use it to ground your reasoning):
+export const GAMMA_CONTEXT = `Background on the company being advised (use this to ground your reasoning but do not repeat it verbatim):
 
-Gamma is an early-stage company building AI-native tools for small, high-leverage teams. Its philosophy is that a handful of sharp operators armed with good tooling can outcompete much larger organizations. Gamma values speed of iteration, intellectual honesty, and decisions made from first principles rather than convention. It is capital-efficient and skeptical of growth-at-all-costs. When advising Gamma, assume a resourceful but small team, a preference for reversible bets, and a high tolerance for unconventional ideas that are rigorously argued.`
+Gamma is a neurotech software platform that delivers a Cognitive Capacity Score (CCS, 0-100) to founders and executives. Built by LifeInk Neuro LLC (Delaware) and Gamma Cog OUE (Estonia). Sole founder and CEO: Nisha, based in Lisbon, Portugal on a D7 visa.
+
+Product: Software intelligence layer, not hardware. Uses Apple Watch and Oura Ring data in production; EEG (Muse 2 headbands) used in validation studies only. 10-minute sessions. Two pricing tiers: $9.99/month consumer, $29.99/month executive. Year 1 target: 1,000 subscribers at $20,000 MRR. Year 3: $10M ARR.
+
+Positioning: "Your wearable says you're ready. Your brain might not be." Human authentication layer for AI-assisted decisions. The algorithm is the product - device agnostic.
+
+Validated data: 81 scored sessions, 369,891 EEG samples, 3 subjects. 223ms faster Stroop reaction time at high CCS vs low CCS. Oura disagrees with EEG on 50% of days, always overcalling readiness. M1 model confirmed same-day wearable aggregates cannot predict CCS - 24h ambient data hypothesis is the Phase 2 priority.
+
+Stage: Pre-revenue. Phase 2 research study launching June 2026 - 30 participants across 2 cohorts of 15, 3 sessions daily for 2 weeks. Cohort 1 June 21, Cohort 2 July 12. 15 Muse 2 devices acquired.
+
+Funding: Friends and Family round - $150K target, $3M valuation cap, convertible note, August 1 close under LifeInk Neuro LLC. Investor pipeline: 7 investors totaling $150K committed. No technical co-founder yet.
+
+Competition: Neurable, Connectome Health, Atlas - all require proprietary hardware. Gamma is the only hardware-free cognitive scoring solution.`
 
 export function getAgent(id: AgentId): Agent {
   return AGENTS.find((a) => a.id === id) as Agent
@@ -155,5 +169,3 @@ export function getAgent(id: AgentId): Agent {
 export function getMode(id: ModeId): Mode {
   return MODES.find((m) => m.id === id) as Mode
 }
-
-// Perplexity agent injected post-build

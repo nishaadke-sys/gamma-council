@@ -1,4 +1,3 @@
-"use client"
 
 import { useCallback, useRef, useState } from "react"
 import { AGENTS, GAMMA_CONTEXT, getMode, type AgentId, type ModeId } from "@/lib/council"
@@ -29,50 +28,22 @@ const AGENT_NAMES = AGENTS.reduce(
   {} as Record<string, string>,
 )
 
-function buildSystem(
-  agentId: AgentId,
-  mode: ModeId,
-  perspective: "founder" | "investor",
-  liveContext: string,
-): string {
+function buildSystem(agentId: AgentId, mode: ModeId, perspective: "founder" | "investor", liveContext: string): string {
   const agent = AGENTS.find((a) => a.id === agentId)!
   const m = getMode(mode)
-
-  const perspectivePrompt =
-    perspective === "investor"
-      ? `You are evaluating everything through an investor lens. For every claim or decision, ask: does this make Gamma more or less fundable? Does this preserve or erode investor trust and return potential? Flag anything that would concern a pre-seed or seed investor. Think about cap table health, milestone sequencing, and what a due diligence process would surface.`
-      : `You are evaluating everything through a founder execution lens. Focus on what moves the needle, what reduces risk, what preserves optionality, and what is achievable with a small bootstrapped team.`
-
-  const parts = [
-    GAMMA_CONTEXT,
-    "",
-    agent.systemPrompt,
-    "",
-    perspectivePrompt,
-    "",
-    `Mode: ${m.name}. ${m.framing}`,
-  ]
-
-  if (liveContext.trim()) {
-    parts.push("", `Current context from the operator:\n${liveContext.trim()}`)
-  }
-
-  const otherAgents = AGENTS.filter((a) => a.id !== agentId)
-    .map((a) => a.name)
-    .join(", ")
-
-  parts.push(
-    "",
-    `You are in a live council chat room with: ${otherAgents}. Address them by name when responding to their points. Be direct, analytical, and combative -- this is a real debate, not a report. Write 6-8 sentences minimum. In round 1, stake out your position and challenge at least one other agent's claim directly. In round 2, either defend your position under pressure or update it with a clear reason why. Do not summarize. Do not agree without evidence. No long dashes. No bullet points.`,
-  )
-
+  const perspectivePrompt = perspective === "investor"
+    ? `Evaluate everything through an investor lens. For every claim or decision, ask: does this make Gamma more or less fundable? Flag anything that would concern a pre-seed or seed investor. Think about cap table health, milestone sequencing, and due diligence.`
+    : `Evaluate everything through a founder execution lens. Focus on what moves the needle, reduces risk, preserves optionality, and is achievable with a small bootstrapped team.`
+  const parts = [GAMMA_CONTEXT, "", agent.systemPrompt, "", perspectivePrompt, "", `Mode: ${m.name}. ${m.framing}`]
+  if (liveContext.trim()) parts.push("", `Current context from the operator:\n${liveContext.trim()}`)
+  const otherAgents = AGENTS.filter((a) => a.id !== agentId).map((a) => a.name).join(", ")
+  parts.push("", `You are in a live council chat room with: ${otherAgents}. Address them by name when responding to their points. Be direct, analytical, and combative -- this is a real debate, not a report. Write 6-8 sentences minimum. In round 1, stake out your position and challenge at least one other agent directly. In round 2, defend or update your position with clear reasoning. Do not summarize. Do not agree without evidence. No long dashes. No bullet points.`)
   return parts.join("\n")
 }
 
 function buildTranscript(topic: string, turns: Turn[], upToIndex: number): string {
   const lines: string[] = [`Topic: ${topic}`, ""]
   const prior = turns.slice(0, upToIndex).filter((t) => t.status === "done" && t.agentId !== "verdict")
-
   if (prior.length === 0) {
     lines.push("You are first to speak. Open the debate with your perspective.")
   } else {
@@ -93,21 +64,42 @@ function buildTranscript(topic: string, turns: Turn[], upToIndex: number): strin
 
 function buildVerdictSystem(liveContext: string): string {
   return [
-    GAMMA_CONTEXT,
+    GAMMA_CONTEXT, "",
+    "You are the Council Verdict synthesizer. After a full council debate, produce a clear final recommendation.",
     "",
-    "You are the Council Verdict synthesizer. After a full council debate, you produce a clear final recommendation.",
-    "",
-    "Your output must have three parts:",
+    "Your output must have four parts:",
     "1. VERDICT: One sentence -- the direct answer to the question debated.",
     "2. KEY TENSIONS: 2-3 sentences on where the council disagreed and why it matters.",
-    "3. RECOMMENDED ACTION: 2-3 concrete next steps the founder should take.",
-    "4. REWRITTEN OUTPUT (only when the debate involves copy, claims, numbers, or materials that need fixing): Deliver the corrected version ready to use. Do not say 'replace X with Y' -- write the actual replacement. If numbers need verification, research and provide verified alternatives with sources.",
+    "3. RECOMMENDED ACTION: 2-3 concrete next steps actionable within 7-14 days. Reference Gamma specifics: Phase 2 launches June 21, F&F round closes August 1 at $150K on $3M cap, potential investor being cultivated in Murcia right now, solo founder no technical co-founder. No generic advice.",
+    "4. REWRITTEN OUTPUT: When the debate involves copy, claims, numbers, or materials that need fixing, deliver the corrected version ready to use. Do not say replace X with Y -- write the actual replacement. If numbers need verification, research and provide verified alternatives with sources.",
     "",
-    "Be decisive. Do not hedge. If the council was split, pick the stronger side and say why. Recommendations must reference Gamma's specific situation: Phase 2 launches June 21 with Cohort 1, F&F round closes August 1 at $150K on a $3M cap, there is a potential investor in Murcia being cultivated in person right now, and the founder is solo with no technical co-founder. Every recommendation must be actionable within the next 7-14 days given these constraints. No long dashes. No generic advice.",
+    "Be decisive. Do not hedge. Pick the stronger side and say why. No long dashes.",
     liveContext.trim() ? `\nContext: ${liveContext.trim()}` : "",
-  ]
-    .filter((x) => x !== undefined)
-    .join("\n")
+  ].filter(Boolean).join("\n")
+}
+
+async function callWithRetry(provider: string, model: string, system: string, messages: ProxyMessage[], maxTokens: number): Promise<string> {
+  const body = JSON.stringify({ provider, model, system, messages, maxTokens })
+  const attempt = async () => {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body,
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status}).`)
+    return data.text || "(no response)"
+  }
+  try {
+    return await attempt()
+  } catch {
+    await new Promise((r) => setTimeout(r, 2000))
+    return await attempt()
+  }
+}
+
+function cleanText(text: string): string {
+  return text.replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-")
 }
 
 export function useDebate() {
@@ -157,6 +149,14 @@ export function useDebate() {
 
     const working = [...initial]
     const costTracker: Record<string, number> = {}
+    const costPerToken: Record<string, number> = {
+      anthropic: 0.000003,
+      openai: 0.000005,
+      gemini: 0.0000005,
+      xai: 0.000003,
+      deepseek: 0.0000009,
+      perplexity: 0.000001,
+    }
 
     for (let i = 0; i < working.length; i++) {
       if (abortRef.current) break
@@ -166,71 +166,11 @@ export function useDebate() {
       const userMessage = buildTranscript(topic, working, i)
       const messages: ProxyMessage[] = [{ role: "user", content: userMessage }]
 
-      const attemptCall = async () => {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            provider: agent.provider,
-            model: agent.model,
-            system,
-            messages,
-            maxTokens: 1200,
-          }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status}).`)
-        return data
-      }
-
       try {
-        let data
-        try {
-          data = await attemptCall()
-        } catch {
-          await new Promise((r) => setTimeout(r, 2000))
-          data = await attemptCall()
-        }
-
-        const text = (data.text || "(no response)").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-")
+        const raw = await callWithRetry(agent.provider, agent.model, system, messages, 1200)
+        const text = cleanText(raw)
         working[i] = { ...turn, content: text, status: "done" }
-
         const tokenEstimate = (system.length + userMessage.length + text.length) / 4
-        const costPerToken: Record<string, number> = {
-          anthropic: 0.000003,
-          openai: 0.000005,
-          gemini: 0.0000005,
-          xai: 0.000003,
-          deepseek: 0.0000009,
-          perplexity: 0.000001,
-        }
-        costTracker[agent.provider] = (costTracker[agent.provider] ?? 0) + tokenEstimate * (costPerToken[agent.provider] ?? 0.000003)
-        setSessionCost({ ...costTracker })
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            provider: agent.provider,
-            model: agent.model,
-            system,
-            messages,
-            maxTokens: 1200,
-          }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status}).`)
-
-        const text = (data.text || "(no response)").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-").replace(/ - /g, " - ")
-        working[i] = { ...turn, content: text, status: "done" }
-
-        const tokenEstimate = (system.length + userMessage.length + text.length) / 4
-        const costPerToken: Record<string, number> = {
-          anthropic: 0.000003,
-          openai: 0.000005,
-          gemini: 0.0000005,
-          xai: 0.000003,
-          deepseek: 0.0000009,
-          perplexity: 0.000001,
-        }
         costTracker[agent.provider] = (costTracker[agent.provider] ?? 0) + tokenEstimate * (costPerToken[agent.provider] ?? 0.000003)
         setSessionCost({ ...costTracker })
       } catch (err) {
@@ -261,29 +201,20 @@ export function useDebate() {
           })
           .join("\n\n")
 
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            provider: "anthropic",
-            model: "claude-sonnet-4-5",
-            system: buildVerdictSystem(liveContext),
-            messages: [{ role: "user", content: `Topic: ${topic}\n\nDebate transcript:\n${transcript}\n\nDeliver the verdict.` }],
-            maxTokens: 700,
-          }),
-        })
-        const data = await res.json()
-        const verdictText = (data.text || "").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-")
+        const raw = await callWithRetry(
+          "anthropic",
+          "claude-sonnet-4-5",
+          buildVerdictSystem(liveContext),
+          [{ role: "user", content: `Topic: ${topic}\n\nDebate transcript:\n${transcript}\n\nDeliver the verdict.` }],
+          700,
+        )
+        const verdictText = cleanText(raw)
         setTurns((prev) =>
-          prev.map((t) =>
-            t.id === verdictTurn.id ? { ...t, content: verdictText, status: "done" } : t,
-          ),
+          prev.map((t) => t.id === verdictTurn.id ? { ...t, content: verdictText, status: "done" } : t)
         )
       } catch {
         setTurns((prev) =>
-          prev.map((t) =>
-            t.id === verdictTurn.id ? { ...t, content: "Verdict generation failed.", status: "error" } : t,
-          ),
+          prev.map((t) => t.id === verdictTurn.id ? { ...t, content: "Verdict generation failed.", status: "error" } : t)
         )
       }
     }

@@ -254,4 +254,3 @@ export function useDebate() {
 
   return { turns, running, error, run, reset, injectFacilitator, sessionCost }
 }
-HEREDOC

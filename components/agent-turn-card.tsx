@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import type { Agent } from "@/lib/council"
@@ -10,12 +9,14 @@ const COLOR_VARS: Record<string, { border: string; dot: string; soft: string }> 
   strategist: { border: "var(--strategist)", dot: "var(--strategist)", soft: "var(--strategist-soft)" },
   realist: { border: "var(--realist)", dot: "var(--realist)", soft: "var(--realist-soft)" },
   contrarian: { border: "var(--contrarian)", dot: "var(--contrarian)", soft: "var(--contrarian-soft)" },
-  researcher: { border: "var(--analyst)", dot: "var(--analyst)", soft: "var(--analyst-soft)" },
+  researcher: { border: "var(--researcher)", dot: "var(--researcher)", soft: "var(--researcher-soft)" },
 }
 
-{expanded && (
-  <div className="space-y-2.5 pt-1 border-t border-border/50 mt-2">
-    {turn.content.split(/\n\n+/).slice(1).map((para, i) => (
+function getSummary(content: string): string {
+  const sentences = content.match(/[^.!?]+[.!?]+/g) ?? []
+  const summary = sentences.slice(0, 2).join(" ").trim()
+  return summary || content.slice(0, 200) + "..."
+}
 
 export function AgentTurnCard({ agent, turn }: { agent: Agent; turn: Turn }) {
   const c = COLOR_VARS[agent.color] ?? COLOR_VARS.analyst
@@ -53,7 +54,6 @@ export function AgentTurnCard({ agent, turn }: { agent: Agent; turn: Turn }) {
         ) : (
           <div className="space-y-2">
             <p className="text-sm leading-relaxed text-foreground/90 text-pretty">{summary}</p>
-
             {hasMore && (
               <>
                 {expanded && (
@@ -70,7 +70,7 @@ export function AgentTurnCard({ agent, turn }: { agent: Agent; turn: Turn }) {
                   className="text-[11px] font-medium mt-1"
                   style={{ color: c.border }}
                 >
-                  {expanded ? "↑ Collapse" : "↓ Read full reasoning"}
+                  {expanded ? "Collapse" : "Read full reasoning"}
                 </button>
               </>
             )}

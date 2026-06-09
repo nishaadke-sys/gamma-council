@@ -230,7 +230,7 @@ export function useDebate() {
             model: "claude-sonnet-4-5",
             system: buildVerdictSystem(liveContext),
             messages: [{ role: "user", content: `Topic: ${topic}\n\nDebate transcript:\n${transcript}\n\nDeliver the verdict.` }],
-            maxTokens: 400,
+            maxTokens: 700,
           }),
         })
         const data = await res.json()

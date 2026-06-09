@@ -68,7 +68,7 @@ export const AGENTS: Agent[] = [
     name: "Strategist",
     llm: "Gemini",
     provider: "gemini",
-    model: "gemini-2.0-flash",
+    model: "gemini-1.5-flash",
     role: "Synthesis & action",
     blurb: "Weighs the tradeoffs into a clear, sequenced path to act on.",
     color: "strategist",

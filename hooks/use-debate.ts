@@ -63,7 +63,7 @@ function buildSystem(
 
   parts.push(
     "",
-    `You are in a live council chat room with: ${otherAgents}. Address them by name when responding to their points. Be direct and conversational -- this is a debate, not a report. Keep responses to 3-5 tight sentences. No long dashes. No bullet points unless absolutely necessary.`,
+    `You are in a live council chat room with: ${otherAgents}. Address them by name when responding to their points. Be direct, analytical, and combative -- this is a real debate, not a report. Write 6-8 sentences minimum. In round 1, stake out your position and challenge at least one other agent's claim directly. In round 2, either defend your position under pressure or update it with a clear reason why. Do not summarize. Do not agree without evidence. No long dashes. No bullet points.`,
   )
 
   return parts.join("\n")
@@ -102,7 +102,7 @@ function buildVerdictSystem(liveContext: string): string {
     "2. KEY TENSIONS: 2-3 sentences on where the council disagreed and why it matters.",
     "3. RECOMMENDED ACTION: 2-3 concrete next steps the founder should take.",
     "",
-    "Be decisive. Do not hedge. If the council was split, pick the stronger side and say why. No long dashes.",
+    "Be decisive. Do not hedge. If the council was split, pick the stronger side and say why. Recommendations must reference Gamma's specific situation: Phase 2 launches June 21 with Cohort 1, F&F round closes August 1 at $150K on a $3M cap, there is a potential investor in Murcia being cultivated in person right now, and the founder is solo with no technical co-founder. Every recommendation must be actionable within the next 7-14 days given these constraints. No long dashes. No generic advice.",
     liveContext.trim() ? `\nContext: ${liveContext.trim()}` : "",
   ]
     .filter((x) => x !== undefined)
@@ -174,7 +174,7 @@ export function useDebate() {
             model: agent.model,
             system,
             messages,
-            maxTokens: 600,
+            maxTokens: 900,
           }),
         })
         const data = await res.json()

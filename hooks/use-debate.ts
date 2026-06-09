@@ -175,7 +175,7 @@ export function useDebate() {
             model: agent.model,
             system,
             messages,
-            maxTokens: 900,
+            maxTokens: 1200,
           }),
         })
         const data = await res.json()

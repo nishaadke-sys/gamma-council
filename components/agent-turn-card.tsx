@@ -13,10 +13,9 @@ const COLOR_VARS: Record<string, { border: string; dot: string; soft: string }> 
   researcher: { border: "var(--analyst)", dot: "var(--analyst)", soft: "var(--analyst-soft)" },
 }
 
-function getSummary(content: string): string {
-  const sentences = content.match(/[^.!?]+[.!?]+/g) ?? []
-  return sentences.slice(0, 2).join(" ").trim() || content.slice(0, 160) + "..."
-}
+{expanded && (
+  <div className="space-y-2.5 pt-1 border-t border-border/50 mt-2">
+    {turn.content.split(/\n\n+/).slice(1).map((para, i) => (
 
 export function AgentTurnCard({ agent, turn }: { agent: Agent; turn: Turn }) {
   const c = COLOR_VARS[agent.color] ?? COLOR_VARS.analyst

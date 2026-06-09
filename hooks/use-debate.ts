@@ -101,6 +101,7 @@ function buildVerdictSystem(liveContext: string): string {
     "1. VERDICT: One sentence -- the direct answer to the question debated.",
     "2. KEY TENSIONS: 2-3 sentences on where the council disagreed and why it matters.",
     "3. RECOMMENDED ACTION: 2-3 concrete next steps the founder should take.",
+    "4. REWRITTEN OUTPUT (only when the debate involves copy, claims, numbers, or materials that need fixing): Deliver the corrected version ready to use. Do not say 'replace X with Y' -- write the actual replacement. If numbers need verification, research and provide verified alternatives with sources.",
     "",
     "Be decisive. Do not hedge. If the council was split, pick the stronger side and say why. Recommendations must reference Gamma's specific situation: Phase 2 launches June 21 with Cohort 1, F&F round closes August 1 at $150K on a $3M cap, there is a potential investor in Murcia being cultivated in person right now, and the founder is solo with no technical co-founder. Every recommendation must be actionable within the next 7-14 days given these constraints. No long dashes. No generic advice.",
     liveContext.trim() ? `\nContext: ${liveContext.trim()}` : "",

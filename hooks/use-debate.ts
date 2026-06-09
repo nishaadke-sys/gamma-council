@@ -1,4 +1,3 @@
-cat > "/Users/nishaadke/Desktop/Gamma Cog OU/gamma-council-app/hooks/use-debate.ts" << 'HEREDOC'
 "use client"
 
 import { useCallback, useRef, useState } from "react"

@@ -166,8 +166,46 @@ export function useDebate() {
       const userMessage = buildTranscript(topic, working, i)
       const messages: ProxyMessage[] = [{ role: "user", content: userMessage }]
 
-      try {
+      const attemptCall = async () => {
         const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            provider: agent.provider,
+            model: agent.model,
+            system,
+            messages,
+            maxTokens: 1200,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status}).`)
+        return data
+      }
+
+      try {
+        let data
+        try {
+          data = await attemptCall()
+        } catch {
+          await new Promise((r) => setTimeout(r, 2000))
+          data = await attemptCall()
+        }
+
+        const text = (data.text || "(no response)").replace(/\u2014/g, "-").replace(/\u2013/g, "-").replace(/--/g, "-")
+        working[i] = { ...turn, content: text, status: "done" }
+
+        const tokenEstimate = (system.length + userMessage.length + text.length) / 4
+        const costPerToken: Record<string, number> = {
+          anthropic: 0.000003,
+          openai: 0.000005,
+          gemini: 0.0000005,
+          xai: 0.000003,
+          deepseek: 0.0000009,
+          perplexity: 0.000001,
+        }
+        costTracker[agent.provider] = (costTracker[agent.provider] ?? 0) + tokenEstimate * (costPerToken[agent.provider] ?? 0.000003)
+        setSessionCost({ ...costTracker })
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({

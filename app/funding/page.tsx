@@ -155,14 +155,14 @@ export default function FundingPage() {
   }))
 
   const founderMetrics: MetricItem[] = [
-    { label: "You keep", value: d.founderOwnership.toFixed(1) + "%", sub: "at conversion" },
-    { label: "Investor gets", value: d.investorOwnership.toFixed(1) + "%", sub: "of company" },
+    { label: "You keep", value: d.founderOwnership.toFixed(3) + "%", sub: "at conversion" },
+    { label: "Investor gets", value: d.investorOwnership.toFixed(3) + "%", sub: "of company" },
     { label: "Accrued debt", value: fmt(d.accrued), sub: "at conversion" },
     { label: "Effective cap", value: fmt(d.conversionVal), sub: "conversion val" },
   ]
 
   const investorMetrics: MetricItem[] = [
-    { label: "Ownership", value: d.investorOwnership.toFixed(1) + "%", sub: "at conversion" },
+    { label: "Ownership", value: d.investorOwnership.toFixed(3) + "%", sub: "at conversion" },
     { label: "Value at next round", value: fmt(d.valueAtNextRound), sub: "on paper" },
     { label: "Paper multiple", value: d.multiple.toFixed(1) + "x", sub: "at next round" },
     { label: "Interest earned", value: fmt(d.accrued - raise), sub: "over " + months + " mo" },
@@ -171,19 +171,19 @@ export default function FundingPage() {
   const metrics = perspective === "founder" ? founderMetrics : investorMetrics
 
   const founderFlags: FlagItem[] = [
-    ...(d.investorOwnership > 7 ? [{ type: "red", text: "Investors will own " + d.investorOwnership.toFixed(1) + "% at conversion. F&F rounds typically give 5-8% total. Consider raising the cap or reducing the raise amount." }] : []),
+    ...(d.investorOwnership > 7 ? [{ type: "red", text: "Investors will own " + d.investorOwnership.toFixed(3) + "% at conversion. F&F rounds typically give 5-8% total. Consider raising the cap or reducing the raise amount." }] : []),
     ...(raise / cap > 0.06 ? [{ type: "amber", text: "Raise-to-cap ratio is " + Math.round(raise / cap * 100) + "%. Above 6% signals the cap may be too low relative to raise size." }] : []),
     ...(interest > 6 ? [{ type: "amber", text: "Interest rate of " + interest + "% is above market standard for F&F (5-6%). Every extra point accrues as additional dilution." }] : []),
     ...(nextVal < cap * 1.5 ? [{ type: "amber", text: "Next round valuation is less than 1.5x the cap. Cap protection only benefits investors if the next round is higher than the cap." }] : []),
-    ...(d.founderOwnership > 92 ? [{ type: "green", text: "You retain " + d.founderOwnership.toFixed(1) + "% at conversion. Strong founder ownership going into pre-seed." }] : []),
+    ...(d.founderOwnership > 92 ? [{ type: "green", text: "You retain " + d.founderOwnership.toFixed(3) + "% at conversion. Strong founder ownership going into pre-seed." }] : []),
     ...(months <= 12 ? [{ type: "green", text: "Short conversion window of " + months + " months means less interest accrual and faster certainty." }] : []),
   ]
 
   const investorFlags: FlagItem[] = [
-    ...(d.investorOwnership < 3 ? [{ type: "amber", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is below 3%. May not be material enough to justify the risk." }] : []),
+    ...(d.investorOwnership < 3 ? [{ type: "amber", text: "Ownership of " + d.investorOwnership.toFixed(3) + "% is below 3%. May not be material enough to justify the risk." }] : []),
     ...(cap > nextVal ? [{ type: "red", text: "Valuation cap exceeds next round valuation. Cap protection is worthless at these settings." }] : []),
     ...(interest < 5 ? [{ type: "amber", text: "Interest rate of " + interest + "% provides minimal downside protection. Market standard is 5-8%." }] : []),
-    ...(d.investorOwnership >= 5 && d.investorOwnership <= 8 ? [{ type: "green", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is within the typical F&F range of 5-8%. Clean structure." }] : []),
+    ...(d.investorOwnership >= 5 && d.investorOwnership <= 8 ? [{ type: "green", text: "Ownership of " + d.investorOwnership.toFixed(3) + "% is within the typical F&F range of 5-8%. Clean structure." }] : []),
     ...(d.multiple > 1.5 ? [{ type: "green", text: "Paper multiple of " + d.multiple.toFixed(1) + "x at next round valuation. Attractive for a friends and family check." }] : []),
   ]
 
@@ -249,6 +249,27 @@ export default function FundingPage() {
 
           {perspective === "investor" && (
             <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">How ownership is calculated</p>
+              <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 1: Accrued value</span>
+                  <span className="text-xs text-muted-foreground font-mono">{fmt(raise)} x (1 + {interest}% x {months}/12) = {fmt(d.accrued)}</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 2: Conversion val</span>
+                  <span className="text-xs text-muted-foreground font-mono">min({fmt(cap)} cap, {fmt(nextVal)} x {100 - discount}%) = {fmt(d.conversionVal)}</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 3: Ownership %</span>
+                  <span className="text-xs text-muted-foreground font-mono">{fmt(d.accrued)} / ({fmt(d.conversionVal)} + {fmt(d.accrued)}) = {d.investorOwnership.toFixed(4)}%</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground/60 border-t border-border pt-2">Interest accrual is why $10K at 5% over 18 months gives 0.358% ownership, not 0.333% (the simple $10K/$3M calculation).</p>
+              </div>
+            </div>
+          )}
+
+          {perspective === "investor" && (
+            <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">If you invest {fmt(raise)}, here is what you get at exit</p>
               <div className="rounded-xl border border-border bg-card p-5">
                 <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-border">
@@ -264,7 +285,7 @@ export default function FundingPage() {
                     <p className={"text-xs font-medium " + (multiple >= 10 ? "text-green-700 dark:text-green-400" : multiple < 1 ? "text-destructive" : "text-foreground")}>{multiple.toFixed(1)}x</p>
                   </div>
                 ))}
-                <p className="text-[11px] text-muted-foreground/60 mt-3">Based on {d.investorOwnership.toFixed(1)}% ownership at conversion. Does not account for future dilution from additional rounds.</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-3">Based on {d.investorOwnership.toFixed(3)}% ownership at conversion. Does not account for future dilution from additional rounds.</p>
               </div>
             </div>
           )}
@@ -305,13 +326,13 @@ export default function FundingPage() {
           {SCENARIOS.map((s) => {
             const sd = calcDilution(s.raise, s.cap, s.discount, s.interest, s.months, s.nextVal)
             const founderItems: MetricItem[] = [
-              { label: "You keep", value: sd.founderOwnership.toFixed(1) + "%" },
-              { label: "Investors get", value: sd.investorOwnership.toFixed(1) + "%" },
+              { label: "You keep", value: sd.founderOwnership.toFixed(3) + "%" },
+              { label: "Investors get", value: sd.investorOwnership.toFixed(3) + "%" },
               { label: "Accrued", value: fmt(sd.accrued) },
               { label: "Raise", value: fmt(s.raise) },
             ]
             const investorItems: MetricItem[] = [
-              { label: "Ownership", value: sd.investorOwnership.toFixed(1) + "%" },
+              { label: "Ownership", value: sd.investorOwnership.toFixed(3) + "%" },
               { label: "Multiple", value: sd.multiple.toFixed(1) + "x" },
               { label: "Interest", value: fmt(sd.accrued - s.raise) },
               { label: "Risk", value: s.discount > 0 ? "Low" : "Med" },

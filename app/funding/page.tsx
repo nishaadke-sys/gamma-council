@@ -250,22 +250,6 @@ export default function FundingPage() {
           {perspective === "investor" && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">How ownership is calculated</p>
-              <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 1: Accrued value</span>
-                  <span className="text-xs text-muted-foreground font-mono">{fmt(raise)} x (1 + {interest}% x {months}/12) = {fmt(d.accrued)}</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 2: Conversion val</span>
-                  <span className="text-xs text-muted-foreground font-mono">min({fmt(cap)} cap, {fmt(nextVal)} x {100 - discount}%) = {fmt(d.conversionVal)}</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[140px] mt-0.5">Step 3: Ownership %</span>
-                  <span className="text-xs text-muted-foreground font-mono">{fmt(d.accrued)} / ({fmt(d.conversionVal)} + {fmt(d.accrued)}) = {d.investorOwnership.toFixed(4)}%</span>
-                </div>
-                <p className="text-[11px] text-muted-foreground/60 border-t border-border pt-2">Interest accrual is why $10K at 5% over 18 months gives 0.358% ownership, not 0.333% (the simple $10K/$3M calculation).</p>
-              </div>
-            </div>
           )}
 
           {perspective === "investor" && (

@@ -1,6 +1,7 @@
-import { Analytics } from '@vercel/analytics/next'
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
+import { Analytics } from '@vercel/analytics/react'
 import { Inter, Geist_Mono } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] })
@@ -10,27 +11,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Gamma Council, Multi-Agent Debate',
-  description:
-    'Convene a council of five AI minds, each on a different model, to debate your hardest decisions across multiple rounds.',
+  title: 'Gamma Council',
+  description: 'Six AI minds debate your hardest decisions.',
   generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
 }
 
 export default function RootLayout({
@@ -39,11 +22,22 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${geistMono.variable} bg-background`}
-    >
+    <html lang="en" className={`${inter.variable} ${geistMono.variable} bg-background`}>
       <body className="font-sans antialiased">
+        <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center gap-1 px-5 py-2 sm:px-6">
+            <div className="flex items-center gap-2 mr-4">
+              <span className="size-2 rounded-full bg-primary" />
+              <span className="text-sm font-semibold tracking-tight text-foreground">Gamma</span>
+            </div>
+            <Link href="/" className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              Council
+            </Link>
+            <Link href="/knowledge" className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              Knowledge
+            </Link>
+          </div>
+        </nav>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

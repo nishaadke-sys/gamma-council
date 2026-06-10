@@ -254,23 +254,53 @@ export default function FundingPage() {
           )}
 
           {perspective === "investor" && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">If you invest {fmt(raise)}, here is what you get at exit</p>
-              <div className="rounded-xl border border-border bg-card p-5">
-                <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-border">
-                  {["Scenario", "Exit value", "Your return", "Multiple"].map((h) => (
-                    <p key={h} className="text-[11px] text-muted-foreground font-medium">{h}</p>
-                  ))}
-                </div>
-                {exitScenarios.map(({ label, exitVal, investorReturn, multiple }) => (
-                  <div key={label} className="grid grid-cols-4 gap-2 py-2 border-b border-border last:border-0">
-                    <p className="text-xs text-muted-foreground">{label}</p>
-                    <p className="text-xs text-foreground">{fmt(exitVal)}</p>
-                    <p className={"text-xs font-medium " + (multiple >= 5 ? "text-green-700 dark:text-green-400" : "text-foreground")}>{fmt(investorReturn)}</p>
-                    <p className={"text-xs font-medium " + (multiple >= 10 ? "text-green-700 dark:text-green-400" : multiple < 1 ? "text-destructive" : "text-foreground")}>{multiple.toFixed(1)}x</p>
+            <div className="space-y-5">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Your ownership as Gamma grows</p>
+                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">This shows how your {fmt(raise)} investment grows in value as Gamma raises each round. Each round dilutes your ownership slightly but increases the company valuation. Industry medians sourced from Carta, PitchBook, and Crunchbase 2026.</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <div className="grid grid-cols-5 gap-2 pb-2 mb-2 border-b border-border">
+                    {["Stage", "Gamma target", "Industry median", "Your ownership", "Stake value"].map((h) => (
+                      <p key={h} className="text-[11px] text-muted-foreground font-medium">{h}</p>
+                    ))}
                   </div>
-                ))}
-                <p className="text-[11px] text-muted-foreground/60 mt-3">Based on {d.investorOwnership.toFixed(3)}% ownership at conversion. Does not account for future dilution from additional rounds.</p>
+                  {[
+                    { stage: "F&F (now)", gammaVal: cap, industry: "No standard. $2M-$5M typical", ownership: d.investorOwnership, note: "You invest today" },
+                    { stage: "Pre-seed", gammaVal: 8000000, industry: "Median $7.7M (PitchBook Q3 2025)", ownership: d.investorOwnership * 0.87, note: "13% dilution" },
+                    { stage: "Seed", gammaVal: 16000000, industry: "Median $16M pre-money (Carta 2025)", ownership: d.investorOwnership * 0.87 * 0.80, note: "20% dilution" },
+                    { stage: "Series A", gammaVal: 45000000, industry: "Median $47.9M pre-money (Carta 2025)", ownership: d.investorOwnership * 0.87 * 0.80 * 0.78, note: "22% dilution" },
+                  ].map(({ stage, gammaVal, industry, ownership }) => (
+                    <div key={stage} className="grid grid-cols-5 gap-2 py-2.5 border-b border-border last:border-0 items-start">
+                      <p className="text-xs font-medium text-foreground">{stage}</p>
+                      <p className="text-xs text-foreground">{fmt(gammaVal)}</p>
+                      <p className="text-[11px] text-muted-foreground leading-snug">{industry}</p>
+                      <p className="text-xs font-medium text-foreground">{ownership.toFixed(4)}%</p>
+                      <p className={"text-xs font-medium " + (gammaVal * ownership / 100 > raise ? "text-green-700 dark:text-green-400" : "text-foreground")}>{fmt(gammaVal * ownership / 100)}</p>
+                    </div>
+                  ))}
+                  <p className="text-[11px] text-muted-foreground/60 mt-3">Stake value = your ownership % x company valuation at that stage. Dilution figures are industry medians.</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">What you get at exit</p>
+                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Exit value is the total price someone pays to acquire Gamma or its market cap if Gamma goes public. Can happen at any stage. Your return is your ownership at that point multiplied by the total exit price.</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-border">
+                    {["Scenario", "Exit value", "Your return", "Multiple"].map((h) => (
+                      <p key={h} className="text-[11px] text-muted-foreground font-medium">{h}</p>
+                    ))}
+                  </div>
+                  {exitScenarios.map(({ label, exitVal, investorReturn, multiple }) => (
+                    <div key={label} className="grid grid-cols-4 gap-2 py-2 border-b border-border last:border-0">
+                      <p className="text-xs text-muted-foreground">{label}</p>
+                      <p className="text-xs text-foreground">{fmt(exitVal)}</p>
+                      <p className={"text-xs font-medium " + (multiple >= 5 ? "text-green-700 dark:text-green-400" : "text-foreground")}>{fmt(investorReturn)}</p>
+                      <p className={"text-xs font-medium " + (multiple >= 10 ? "text-green-700 dark:text-green-400" : multiple < 1 ? "text-destructive" : "text-foreground")}>{multiple.toFixed(2)}x</p>
+                    </div>
+                  ))}
+                  <p className="text-[11px] text-muted-foreground/60 mt-3">Based on {d.investorOwnership.toFixed(4)}% ownership at F&F conversion. Does not account for dilution from rounds after Series A.</p>
+                </div>
               </div>
             </div>
           )}

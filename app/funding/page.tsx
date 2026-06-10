@@ -187,7 +187,22 @@ export default function FundingPage() {
                 <p className="text-sm font-medium text-foreground mb-1">{s.name}</p>
                 <p className="text-xs text-muted-foreground mb-4">{s.note}</p>
                 <div className="grid grid-cols-4 gap-2">
-                  {perspective === "founder" ? [
+                  {(perspective === "founder" ? [
+                    { label: "You keep", value: sd.founderOwnership.toFixed(1) + "%" },
+                    { label: "Investors get", value: sd.investorOwnership.toFixed(1) + "%" },
+                    { label: "Accrued", value: fmt(sd.accrued) },
+                    { label: "Raise", value: fmt(s.raise) },
+                  ] : [
+                    { label: "Ownership", value: sd.investorOwnership.toFixed(1) + "%" },
+                    { label: "Multiple", value: sd.multiple.toFixed(1) + "x" },
+                    { label: "Interest", value: fmt(sd.accrued - s.raise) },
+                    { label: "Risk", value: s.discount > 0 ? "Low" : "Med" },
+                  ]).map(({ label, value }) => (
+                    <div key={label} className="rounded-lg bg-muted p-2.5 text-center">
+                      <p className="text-[11px] text-muted-foreground mb-0.5">{label}</p>
+                      <p className="text-sm font-medium text-foreground">{value}</p>
+                    </div>
+                  ))}
                     { label: "You keep", value: sd.founderOwnership.toFixed(1) + "%" },
                     { label: "Investors get", value: sd.investorOwnership.toFixed(1) + "%" },
                     { label: "Accrued", value: fmt(sd.accrued) },

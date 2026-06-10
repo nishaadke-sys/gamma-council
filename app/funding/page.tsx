@@ -124,7 +124,7 @@ export default function FundingPage() {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Your deal parameters</p>
             <div className="rounded-xl border border-border bg-card p-5 space-y-3">
               {([
-                { label: "Raise amount", display: fmt(raise), min: 50000, max: 500000, step: 5000, value: raise, set: setRaise },
+                { label: "Investment amount", display: fmt(raise), min: 10000, max: 500000, step: 5000, value: raise, set: setRaise },
                 { label: "Valuation cap", display: fmt(cap), min: 1000000, max: 10000000, step: 100000, value: cap, set: setCap },
                 { label: "Discount rate", display: discount + "%", min: 0, max: 30, step: 1, value: discount, set: setDiscount },
                 { label: "Interest rate (%/yr)", display: interest + "%", min: 0, max: 10, step: 0.5, value: interest, set: setInterest },

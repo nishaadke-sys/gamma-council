@@ -5,7 +5,7 @@ import { useState } from "react"
 const SECTIONS = [
   {
     id: "current",
-    title: "Current legal state",
+    title: "Now - current legal state",
     content: [
       { heading: "What you have", body: "Two legal entities: Gamma Cog OUE (Estonian e-Residency via Xolo, EU operations) and LifeInk Neuro LLC (Delaware, US operations). F&F round issuing under LifeInk Neuro LLC. Mia consulting agreement signed with IP assignment. Marcelo terminated - no equity, no role.", status: "good" },
       { heading: "What you need before August 1", body: "Signed convertible note or SAFE for each investor. Wire instructions for LifeInk Neuro LLC. Cap table tracking all investors. India compliance review started for uncle wire. BOI report filed with FinCEN if LifeInk Neuro LLC formed after January 1 2024 - required within 90 days, $500/day fine for non-compliance.", status: "action" },
@@ -14,7 +14,7 @@ const SECTIONS = [
   },
   {
     id: "ff",
-    title: "F&F round legals",
+    title: "Now - F&F round legals",
     content: [
       { heading: "What legally binding means", body: "A verbal yes is not legally binding. A signed document is. For a convertible note or SAFE to be enforceable you need: a written agreement signed by both parties, consideration meaning money actually exchanged, and clear terms including amount, cap, and issuing entity. The YC standard SAFE is 5 pages and covers all of this.", status: "info" },
       { heading: "What you must disclose", body: "You are legally required to be honest about material facts: current financial state (pre-revenue), known risks (single subject dataset, no technical co-founder), actual use of funds, and the nature of the instrument they are signing. You do not need to disclose trade secrets like your algorithm. But you cannot misrepresent your traction or financials.", status: "info" },
@@ -25,7 +25,7 @@ const SECTIONS = [
   },
   {
     id: "entities",
-    title: "Entity structure",
+    title: "Now - entity structure",
     content: [
       { heading: "Why Delaware C-Corp is the VC standard", body: "Every VC term sheet, SAFE, convertible note, stock option plan, and drag-along right is built around Delaware corporate law. When a VC reviews your cap table they work from a body of law they know cold. Anything else creates friction and sometimes a hard stop. If you plan to raise institutional money, you will need a Delaware C-Corp at some point.", status: "info" },
       { heading: "Your current structure", body: "Gamma Cog OUE (Estonia) is your EU operating entity - good for EU contracts and Xolo management. LifeInk Neuro LLC (Delaware LLC) is your US entity for F&F fundraising. An LLC is not ideal for VC fundraising long-term - VCs prefer C-Corps because LLCs have pass-through taxation that complicates their fund structures. For F&F and potentially pre-seed, an LLC is acceptable.", status: "warning" },
@@ -35,7 +35,7 @@ const SECTIONS = [
   },
   {
     id: "ip",
-    title: "IP protection",
+    title: "Now - IP protection",
     content: [
       { heading: "IP assignment - most important document you may not have", body: "An IP assignment agreement between you and your company formally assigns all IP you created - the algorithm, codebase, research findings, brand - to the company. Without this, you personally own the IP, not the company. Every investor will require this before closing. It is a 1-2 page document. Get this done before the first SAFE or note is signed.", status: "action" },
       { heading: "What Mia owns", body: "Per the consulting agreement Mia signed, all work product she creates for Gamma is assigned to the company. This includes the Phase 2 protocol, methodology, and analysis. Her agreement has the IP assignment clause. This is clean.", status: "good" },
@@ -45,7 +45,7 @@ const SECTIONS = [
   },
   {
     id: "gdpr",
-    title: "GDPR compliance",
+    title: "Before Phase 2 - GDPR",
     content: [
       { heading: "Why GDPR applies to you", body: "You are based in Portugal collecting data from EU residents. GDPR applies regardless of where your company is incorporated. EEG data and health data are Special Category data under GDPR Article 9, which requires explicit consent and extra safeguards.", status: "info" },
       { heading: "What Phase 2 requires", body: "Explicit informed consent form signed before any data collection. Clear explanation of what data is collected, how it is used, who has access, and how long it is kept. Right to withdraw consent and have data deleted. Privacy policy on gammacog.com. Your iOS screener has consent flow built in - this is correct.", status: "good" },
@@ -55,7 +55,7 @@ const SECTIONS = [
   },
   {
     id: "preseed",
-    title: "Pre-seed legals",
+    title: "Pre-seed - legals",
     content: [
       { heading: "What pre-seed due diligence requires", body: "Before any pre-seed close, investors will ask for: clean Delaware C-Corp incorporation with bylaws, signed IP assignment agreements from all founders, all prior SAFE and convertible note documents with closing records, a verified cap table on Carta or Pulley, any material contracts, privacy policy and terms of service, and a financial model showing path to revenue.", status: "info" },
       { heading: "409A valuation", body: "A 409A is an independent valuation of your common stock. Required before you issue any stock options to employees or advisors. Without it you cannot set a legal option strike price. At pre-seed, a 409A costs $2K-$5K. You do not need one now but you will need one before your first technical co-founder joins on equity.", status: "info" },
@@ -65,7 +65,7 @@ const SECTIONS = [
   },
   {
     id: "portugal",
-    title: "Portugal D7 visa",
+    title: "Ongoing - Portugal D7",
     content: [
       { heading: "D7 visa and startup income", body: "Your D7 Passive Income Visa requires demonstrating passive income meeting minimum thresholds. Investment income from your own startup is not passive income. Revenue from Gamma (salary, dividends) counts as active income. Your September 4 AIMA renewal requires showing minimum Portuguese bank balance of approximately EUR 11,040. Your planned NovoBanco transfer in July is the right move - build 2 months of visible balance history before the appointment.", status: "warning" },
       { heading: "NHR tax regime", body: "Portugal's Non-Habitual Resident regime (IFICI for new applicants since 2024) can significantly reduce your tax burden. Foreign-source income including dividends and capital gains may qualify for reduced rates depending on your situation and the applicable double-taxation treaty. Consult a Portuguese tax attorney if you have not already applied.", status: "info" },
@@ -74,7 +74,7 @@ const SECTIONS = [
   },
   {
     id: "exit",
-    title: "Exit basics",
+    title: "Long-term - exit basics",
     content: [
       { heading: "Liquidation waterfall", body: "When a company is acquired or shuts down, money flows in this order: (1) secured creditors, (2) unsecured creditors including convertible note holders if not converted, (3) preferred shareholders with liquidation preferences, (4) common shareholders including founders. If your F&F investors used convertible notes and they have not yet converted, they are debt holders and get paid before you in a bad exit.", status: "info" },
       { heading: "Stock sale vs asset sale", body: "In a stock sale (most startup acquisitions), the acquirer buys the company and all shareholders get paid proportionally based on ownership. In an asset sale, the company gets the money then distributes to shareholders after paying liabilities. Your F&F investors get their liquidation preference first (their money back), then pro-rata share of remaining proceeds.", status: "info" },

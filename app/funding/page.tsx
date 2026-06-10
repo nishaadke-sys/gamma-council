@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 
@@ -29,13 +28,94 @@ const SCENARIOS = [
 ]
 
 const DEFS = [
-  { term: "Convertible note", body: "A loan that converts into equity at a future funding round. Has an interest rate and maturity date. If you never raise again, you owe the money back.", founder: "You owe interest until conversion. More investor-protective than SAFE.", investor: "Provides repayment rights if company fails to raise. Interest accrues as additional ownership." },
-  { term: "SAFE", body: "A YC instrument that converts to equity at the next round with no interest and no maturity date. Simpler and faster than a note. No repayment obligation.", founder: "No interest means less accrual. No maturity date means no pressure to convert.", investor: "No repayment rights. More founder-friendly. Relies entirely on a future priced round." },
-  { term: "Valuation cap", body: "The maximum valuation used to calculate the investor's share price at conversion. Protects early investors from a high future valuation.", founder: "Lower cap means more dilution. Your $3M cap means investors always convert at $3M or below regardless of how high your valuation goes.", investor: "The cap is your return mechanism. At $3M cap and $6M next round, you get 2x the shares you'd get without a cap." },
-  { term: "Discount rate", body: "A percentage reduction on the share price at conversion. A 20% discount means you buy shares at 80% of what new investors pay.", founder: "Discounts compound with caps if both included. Standard F&F often has just a cap with no discount.", investor: "Guarantees more shares than next round investors regardless of valuation." },
-  { term: "Dilution", body: "The reduction in ownership percentage when new shares are issued. Every round dilutes you. F&F, pre-seed, seed, and Series A each add a layer.", founder: "You start at 100%. After F&F at $3M cap: ~95%. After pre-seed: ~78%. After seed: ~62%. After Series A: ~47%. Illustrative.", investor: "Your ownership gets diluted by each subsequent round too unless you have pro-rata rights." },
-  { term: "Pro-rata rights", body: "The right to invest in future rounds to maintain your ownership percentage.", founder: "Only offer to investors who will actually exercise. Locks you into offering them a slot in every future round.", investor: "Critical at seed stage. Without pro-rata your 5% gets diluted to 2% by seed." },
-  { term: "MFN clause", body: "Most Favored Nation. If you give better terms to a future investor, existing MFN investors automatically get those same terms.", founder: "Can create surprises. If you raise next F&F at higher cap, MFN investors get that cap automatically.", investor: "Protects against founder giving better terms to a later investor without your knowledge." },
+  {
+    term: "SAFE (Simple Agreement for Future Equity)",
+    plain: "You hand me $10K today. Nothing happens yet. When I raise a real round from VCs, your $10K automatically turns into shares at a better price than what the VCs pay. No loan to repay, no deadline, no interest.",
+    body: "The most common early-stage instrument today, used in 90% of pre-seed deals in 2025. A SAFE is not a loan. It has no interest and no maturity date. It converts automatically when the company raises a priced equity round.",
+    founder: "Cleanest structure for F&F. No debt on your balance sheet. No deadline pressure. If you never raise again, you owe nothing. Downside: post-money SAFEs lock in investor ownership percentage, which can dilute you more than expected when multiple SAFEs stack.",
+    investor: "You get in early at a favorable valuation. No interest, but also no repayment rights if the company fails. Your money is locked until a priced round happens, which could be 12 months or several years.",
+    best_for: "Pre-seed, F&F rounds, angels investing under $500K. Gamma's current raise should consider SAFE as an alternative to convertible note.",
+  },
+  {
+    term: "Convertible note",
+    plain: "You lend me $10K. Instead of paying you back in cash, when I raise my next big funding round, your loan turns into shares. You earn a little interest while you wait, and you get shares at a better price than the new investors.",
+    body: "A convertible note is technically a loan that converts to equity at the next priced round. It carries an interest rate (typically 5-8%), a maturity date (12-24 months), and conversion terms. More legal protections for investors than a SAFE. Gamma's current F&F instrument.",
+    founder: "Interest accrues, meaning more dilution at conversion. If you hit the maturity date without raising, investors can demand repayment, which can put the company in a difficult position. Only use if investors specifically require it over a SAFE.",
+    investor: "You earn interest while waiting. You have repayment rights as a backstop if the company never raises again. More familiar to traditional investors. The downside: if the company does well, your return is capped by the conversion terms.",
+    best_for: "Bridge rounds between priced rounds, investors who want debt protections, F&F investors who are uncomfortable with SAFEs.",
+  },
+  {
+    term: "Priced equity round (Seed, Series A, B...)",
+    plain: "The company sets an actual price tag. Investors buy shares at that price. Everyone knows exactly what percentage they own the moment the deal closes. No guessing, no conversion later.",
+    body: "A priced round means the company has an agreed valuation. Investors receive preferred shares immediately. Requires a term sheet, investment agreement, and full cap table update. Takes 6-12 weeks to close. This is also when SAFEs and convertible notes convert.",
+    founder: "You know exactly what you are giving away. No uncertainty. But you are committing to a valuation. Too high and your next round becomes harder. Too low and you give away too much. Option pool is typically created or expanded here, which dilutes you.",
+    investor: "You own shares immediately. Preferred stock comes with protections: liquidation preference, anti-dilution, pro-rata rights. Board seat typically starts at Series A. You can see the full cap table.",
+    best_for: "Seed rounds of $500K+, Series A onwards, institutional VCs and lead investors.",
+  },
+  {
+    term: "Revenue-based financing (RBF)",
+    plain: "You give me $100K. I pay you back $150K over time, out of my monthly revenue, say 5% of every dollar I bring in until I hit $150K total. No shares, no ownership, just repayment with a premium.",
+    body: "RBF is a loan repaid as a fixed percentage of monthly revenue until a total repayment cap is reached, typically 1.5-3x the original amount. The investor gets no equity, only cash repayments. Only works for companies with predictable recurring revenue.",
+    founder: "Zero dilution, you keep 100% of your company. But you need revenue to repay, so it is not suitable pre-revenue. The total cost of 1.5-3x repayment is expensive if your valuation is low and equity would be cheaper.",
+    investor: "Predictable returns tied to revenue performance. No equity upside if the company becomes a unicorn. Better suited to capital-preservation investors than growth investors.",
+    best_for: "Post-revenue SaaS companies with $10K+ MRR. Not suitable for Gamma at current pre-revenue stage.",
+  },
+  {
+    term: "Grants and non-dilutive funding",
+    plain: "Free money. No repayment, no equity, no ownership transfer. You apply, you win, you keep it, and 100% of your company stays yours.",
+    body: "Government grants, accelerator grants, and R&D tax credits give you capital without giving up equity. Examples include NVIDIA Inception (GPU credits, investor introductions), EU Horizon grants, and Portugal's IAPMEI programs. Non-dilutive funding is always the best money available when accessible.",
+    founder: "Apply for everything you qualify for. Zero dilution. The time cost of applications is worth it. NVIDIA Inception is free to apply and takes under two hours.",
+    investor: "Not applicable, investors do not participate in grants. But grants on your funding history show resourcefulness and reduce how much equity you need to sell.",
+    best_for: "All stages. NVIDIA Inception is the most immediately relevant for Gamma. Apply before raising pre-seed.",
+  },
+  {
+    term: "Valuation cap",
+    plain: "Think of it as a price ceiling for early investors. Even if your company is worth $20M by the time you raise your next round, early investors convert as if it is still worth $3M, so they get more shares per dollar than the new investors.",
+    body: "The cap protects early investors from being diluted by a high future valuation. It sets the maximum valuation used to calculate their share price at conversion. Lower cap means more dilution for founders.",
+    founder: "Your $3M cap is appropriate for a pre-revenue F&F round. At a $6M pre-seed, your F&F investors convert at $3M, getting 2x the shares of new investors. The higher your next round valuation, the more your F&F investors benefit from the cap.",
+    investor: "The cap is where you make your money. It locks in a favorable price per share regardless of how high the company's valuation goes at the next round.",
+    best_for: "Always included in SAFEs and convertible notes. Critical term to negotiate carefully.",
+  },
+  {
+    term: "Discount rate",
+    plain: "A guaranteed price cut at conversion. If new investors pay $1 per share, a 20% discount means you only pay $0.80. It rewards you for writing a check earlier and taking more risk.",
+    body: "The discount is applied to the share price at conversion. A 20% discount at a $10 per share priced round means the SAFE or note holder pays $8 per share, getting more shares per dollar than new investors.",
+    founder: "Discounts compound with caps. If both are in the agreement, investors get whichever gives them more shares. Standard F&F rounds often include a cap with no discount. Adding a discount on top of a $3M cap increases dilution.",
+    investor: "Guarantees a price advantage over new investors regardless of valuation. More valuable when next round valuation is near or below the cap.",
+    best_for: "Often omitted in F&F rounds. More common in seed bridge rounds between priced rounds.",
+  },
+  {
+    term: "Liquidation preference",
+    plain: "If the company sells or shuts down, preferred investors get their money back first before founders and employees see anything. Think of it as a refund guarantee in bad outcomes.",
+    body: "Liquidation preferences determine payout order in an exit or dissolution. 1x non-participating is market standard, meaning investors get their investment back first, then participate in remaining proceeds alongside common shareholders.",
+    founder: "1x non-participating is fair and standard. Reject 2x preferences or participating preferred, which can wipe out your return in a modest exit even if the company sold for a reasonable price.",
+    investor: "Your downside protection. In a bad exit, you recover your investment before founders see anything. In a great exit, you convert to common stock and share in the full upside.",
+    best_for: "Priced equity rounds (Seed, Series A+). Not present in SAFEs or convertible notes.",
+  },
+  {
+    term: "Pro-rata rights",
+    plain: "The right to invest again in the next round to keep your ownership percentage the same. You own 5% now. The next round would dilute you to 3%. Pro-rata rights let you write another check to stay at 5%.",
+    body: "Pro-rata rights allow investors to maintain their ownership percentage across funding rounds. They are not automatic. Investors must actively exercise them at each subsequent round by writing another check.",
+    founder: "Only offer to investors who will actually write follow-on checks. It reserves a slot for them in every future round, which reduces how much you can give to new investors.",
+    investor: "Essential for protecting your position over time. Without pro-rata, a 5% F&F stake gets diluted to roughly 2% by Series A. With pro-rata, you can maintain your percentage by investing more.",
+    best_for: "Offer to investors writing $25K+ checks. Becomes standard at Seed and Series A.",
+  },
+  {
+    term: "Post-money vs pre-money SAFE",
+    plain: "Post-money SAFE: the cap is calculated after your investment converts. You know exactly what percentage you own right away. Pre-money SAFE: the math is done before, so your final percentage depends on how many other SAFEs are also converting, which is harder to predict.",
+    body: "YC's current standard SAFE is post-money. It gives investors a fixed ownership percentage at conversion. The difference matters most when multiple SAFEs are stacked.",
+    founder: "Post-money SAFEs are slightly more dilutive when you raise multiple SAFEs. If you raise $150K on a $3M post-money SAFE, that investor owns exactly 5% after conversion regardless of what else converts alongside it.",
+    investor: "Post-money gives you certainty. You know you own 5% and nothing changes that. Pre-money SAFEs are less predictable, your final percentage depends on the full conversion stack.",
+    best_for: "Post-money is the current standard. Use it unless your attorney specifically recommends pre-money for your situation.",
+  },
+  {
+    term: "MFN (Most Favored Nation) clause",
+    plain: "If I give better terms to a future investor, say a higher valuation cap or bigger discount, you automatically get those same better terms too. It is a fairness guarantee.",
+    body: "An MFN clause means that if the company issues a future SAFE or note with better terms, existing MFN holders automatically upgrade to match those terms.",
+    founder: "MFN can create surprises. If you raise your next F&F tranche at a $5M cap, all MFN investors at $3M automatically get the $5M cap. Think carefully before including it in all F&F documents.",
+    investor: "Protects against the founder giving better terms to a later investor without your knowledge. A reasonable ask for angels who write checks early.",
+    best_for: "Often included in SAFEs for angels investing $25K+. Consider carefully before offering to all F&F investors.",
+  },
 ]
 
 type MetricItem = { label: string; value: string; sub?: string }
@@ -60,6 +140,18 @@ export default function FundingPage() {
     { name: "Series A", pct: d.founderOwnership * 0.82 * 0.8 * 0.75 },
   ]
 
+  const exitScenarios = [
+    { label: "Conservative exit", val: 5000000 },
+    { label: "Decent exit", val: 20000000 },
+    { label: "Strong exit", val: 50000000 },
+    { label: "Unicorn exit", val: 1000000000 },
+  ].map(({ label, val }) => ({
+    label,
+    exitVal: val,
+    investorReturn: val * (d.investorOwnership / 100),
+    multiple: (val * (d.investorOwnership / 100)) / raise,
+  }))
+
   const founderMetrics: MetricItem[] = [
     { label: "You keep", value: d.founderOwnership.toFixed(1) + "%", sub: "at conversion" },
     { label: "Investor gets", value: d.investorOwnership.toFixed(1) + "%", sub: "of company" },
@@ -80,16 +172,16 @@ export default function FundingPage() {
     ...(d.investorOwnership > 7 ? [{ type: "red", text: "Investors will own " + d.investorOwnership.toFixed(1) + "% at conversion. F&F rounds typically give 5-8% total. Consider raising the cap or reducing the raise amount." }] : []),
     ...(raise / cap > 0.06 ? [{ type: "amber", text: "Raise-to-cap ratio is " + Math.round(raise / cap * 100) + "%. Above 6% signals the cap may be too low relative to raise size." }] : []),
     ...(interest > 6 ? [{ type: "amber", text: "Interest rate of " + interest + "% is above market standard for F&F (5-6%). Every extra point accrues as additional dilution." }] : []),
-    ...(nextVal < cap * 1.5 ? [{ type: "amber", text: "Next round valuation is less than 1.5x the cap. Structure only helps investors if the next round is higher than the cap." }] : []),
+    ...(nextVal < cap * 1.5 ? [{ type: "amber", text: "Next round valuation is less than 1.5x the cap. Cap protection only benefits investors if the next round is higher than the cap." }] : []),
     ...(d.founderOwnership > 92 ? [{ type: "green", text: "You retain " + d.founderOwnership.toFixed(1) + "% at conversion. Strong founder ownership going into pre-seed." }] : []),
-    ...(months <= 12 ? [{ type: "green", text: "Short conversion window of " + months + " months means less interest accrual and faster certainty for both sides." }] : []),
+    ...(months <= 12 ? [{ type: "green", text: "Short conversion window of " + months + " months means less interest accrual and faster certainty." }] : []),
   ]
 
   const investorFlags: FlagItem[] = [
-    ...(d.investorOwnership < 3 ? [{ type: "amber", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is below 3%. May not be material enough for institutional investors." }] : []),
-    ...(cap > nextVal ? [{ type: "red", text: "Valuation cap exceeds next round valuation. The cap protection is worthless." }] : []),
+    ...(d.investorOwnership < 3 ? [{ type: "amber", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is below 3%. May not be material enough to justify the risk." }] : []),
+    ...(cap > nextVal ? [{ type: "red", text: "Valuation cap exceeds next round valuation. Cap protection is worthless at these settings." }] : []),
     ...(interest < 5 ? [{ type: "amber", text: "Interest rate of " + interest + "% provides minimal downside protection. Market standard is 5-8%." }] : []),
-    ...(d.investorOwnership >= 5 && d.investorOwnership <= 8 ? [{ type: "green", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is within the typical F&F range of 5-8%." }] : []),
+    ...(d.investorOwnership >= 5 && d.investorOwnership <= 8 ? [{ type: "green", text: "Ownership of " + d.investorOwnership.toFixed(1) + "% is within the typical F&F range of 5-8%. Clean structure." }] : []),
     ...(d.multiple > 1.5 ? [{ type: "green", text: "Paper multiple of " + d.multiple.toFixed(1) + "x at next round valuation. Attractive for a friends and family check." }] : []),
   ]
 
@@ -121,7 +213,7 @@ export default function FundingPage() {
       {tab === "calculator" && (
         <div className="space-y-8">
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Your deal parameters</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Deal parameters</p>
             <div className="rounded-xl border border-border bg-card p-5 space-y-3">
               {([
                 { label: "Investment amount", display: fmt(raise), min: 10000, max: 500000, step: 5000, value: raise, set: setRaise },
@@ -153,6 +245,28 @@ export default function FundingPage() {
             </div>
           </div>
 
+          {perspective === "investor" && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">If you invest {fmt(raise)}, here is what you get at exit</p>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-border">
+                  {["Scenario", "Exit value", "Your return", "Multiple"].map((h) => (
+                    <p key={h} className="text-[11px] text-muted-foreground font-medium">{h}</p>
+                  ))}
+                </div>
+                {exitScenarios.map(({ label, exitVal, investorReturn, multiple }) => (
+                  <div key={label} className="grid grid-cols-4 gap-2 py-2 border-b border-border last:border-0">
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="text-xs text-foreground">{fmt(exitVal)}</p>
+                    <p className={"text-xs font-medium " + (multiple >= 5 ? "text-green-700 dark:text-green-400" : "text-foreground")}>{fmt(investorReturn)}</p>
+                    <p className={"text-xs font-medium " + (multiple >= 10 ? "text-green-700 dark:text-green-400" : multiple < 1 ? "text-destructive" : "text-foreground")}>{multiple.toFixed(1)}x</p>
+                  </div>
+                ))}
+                <p className="text-[11px] text-muted-foreground/60 mt-3">Based on {d.investorOwnership.toFixed(1)}% ownership at conversion. Does not account for future dilution from additional rounds.</p>
+              </div>
+            </div>
+          )}
+
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">Founder ownership across rounds</p>
             <div className="rounded-xl border border-border bg-card p-5 space-y-3">
@@ -174,7 +288,7 @@ export default function FundingPage() {
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">{perspective === "founder" ? "Founder flags" : "Investor flags"}</p>
               <div className="space-y-2">
                 {flags.map((f, i) => (
-                  <div key={i} className={"flex items-start gap-2 p-3 rounded-lg text-xs leading-relaxed " + (f.type === "red" ? "bg-destructive/10 text-destructive" : f.type === "green" ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200" : "bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200")}>
+                  <div key={i} className={"p-3 rounded-lg text-xs leading-relaxed " + (f.type === "red" ? "bg-destructive/10 text-destructive" : f.type === "green" ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200" : "bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200")}>
                     {f.text}
                   </div>
                 ))}
@@ -221,17 +335,33 @@ export default function FundingPage() {
       )}
 
       {tab === "definitions" && (
-        <div className="space-y-1">
-          {DEFS.map((def) => (
-            <div key={def.term} className="py-4 border-b border-border">
-              <p className="text-sm font-medium text-foreground mb-1">{def.term}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-2">{def.body}</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-[11px] px-2 py-1 rounded-full bg-primary/10 text-primary">Founder: {def.founder}</span>
-                <span className="text-[11px] px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Investor: {def.investor}</span>
+        <div>
+          <p className="text-xs text-muted-foreground mb-6 leading-relaxed">Plain English explanations of every funding instrument and term. Each entry shows what it means for you as the founder and what it means for your investor.</p>
+          <div className="space-y-0">
+            {DEFS.map((def) => (
+              <div key={def.term} className="py-6 border-b border-border">
+                <p className="text-sm font-medium text-foreground mb-3">{def.term}</p>
+                <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 mb-4">
+                  <p className="text-xs text-foreground/90 leading-relaxed">{def.plain}</p>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{def.body}</p>
+                <div className="space-y-2 mb-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-[11px] font-medium text-primary shrink-0 min-w-[52px] mt-0.5">Founder</span>
+                    <span className="text-xs text-muted-foreground leading-relaxed">{def.founder}</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-[11px] font-medium text-green-700 dark:text-green-400 shrink-0 min-w-[52px] mt-0.5">Investor</span>
+                    <span className="text-xs text-muted-foreground leading-relaxed">{def.investor}</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[11px] text-muted-foreground/60 shrink-0 mt-0.5">Best for</span>
+                  <span className="text-[11px] text-muted-foreground leading-relaxed">{def.best_for}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </main>

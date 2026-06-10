@@ -125,7 +125,7 @@ type FlagItem = { type: string; text: string }
 
 export default function FundingPage() {
   const [perspective, setPerspective] = useState<"founder" | "investor">("founder")
-  const [tab, setTab] = useState<"calculator" | "scenarios" | "definitions">("calculator")
+  const [tab, setTab] = useState<"calculator" | "scenarios" | "definitions" | "playbook">("calculator")
   const [raise, setRaise] = useState(150000)
   const [cap, setCap] = useState(3000000)
   const [discount, setDiscount] = useState(0)
@@ -205,7 +205,7 @@ export default function FundingPage() {
       </div>
 
       <div className="flex gap-1 mb-6 border-b border-border pb-3">
-        {(["calculator", "scenarios", "definitions"] as const).map((t) => (
+        {(["calculator", "scenarios", "definitions", "playbook"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (tab === t ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
             {t}
           </button>
@@ -364,6 +364,122 @@ export default function FundingPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+      {tab === "playbook" && (
+        <div className="space-y-10">
+          <p className="text-xs text-muted-foreground">Playbook content loading...</p>
+        </div>
+      )}
+
+      {tab === "playbook" && (
+        <div className="space-y-10">
+
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">What closing means</p>
+            <p className="text-xs text-muted-foreground mb-5 leading-relaxed">August 1 is your close date. Closing means every investor has signed, wired, and is on your cap table. Verbal yes does not count. Signed but no wire does not count.</p>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {[
+                { step: "1", title: "Document sent", body: "Send the signed SAFE or convertible note to the investor. Have it ready before any conversation so you can send within 24 hours of a verbal yes." },
+                { step: "2", title: "Investor countersigns", body: "They sign and return. Nothing is closed until this happens regardless of what they said verbally. Send a reminder after 48 hours if you have not heard back." },
+                { step: "3", title: "Wire received", body: "Money lands in LifeInk Neuro LLC's Delaware bank account. Signed document with no wire is not closed. Send wire instructions with the document." },
+                { step: "4", title: "Confirmation sent", body: "Send a brief email acknowledging receipt and welcoming them as an investor. Keep it short and warm." },
+                { step: "5", title: "Cap table updated", body: "Add investor name, amount, instrument type, and date immediately. Do not wait until all investors are in." },
+              ].map(({ step, title, body }) => (
+                <div key={step} className="flex gap-4 p-4">
+                  <span className="size-6 rounded-full bg-primary/10 text-primary text-[11px] font-medium flex items-center justify-center shrink-0 mt-0.5">{step}</span>
+                  <div>
+                    <p className="text-xs font-medium text-foreground mb-1">{title}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 space-y-2">
+              {[
+                { type: "red", text: "India wire (uncle $25K): Start compliance review now. International wires from India to a US LLC take 2-3 weeks minimum with AML and KYC checks. If you wait until mid-July you will miss August 1." },
+                { type: "amber", text: "Verbal yes is not a close. Send the document within 24 hours of a verbal yes to keep momentum. One warm follow-up if they go quiet, then move on." },
+                { type: "green", text: "Lawyer stall prevention: Send the SAFE before the call. This is the YC standard 5-page template used by thousands of startups. When it is normalized upfront the pause usually does not happen." },
+              ].map((f, i) => (
+                <div key={i} className={"p-3 rounded-lg text-xs leading-relaxed " + (f.type === "red" ? "bg-destructive/10 text-destructive" : f.type === "green" ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200" : "bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200")}>
+                  {f.text}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Investor readiness checklist</p>
+            <p className="text-xs text-muted-foreground mb-5 leading-relaxed">Everything you need ready before an investor says yes.</p>
+            <div className="space-y-6">
+              {[
+                {
+                  section: "Documents to have ready",
+                  items: [
+                    "Signed SAFE or convertible note template (YC standard, filled with your terms: $3M cap, 5% interest, August 1 close, LifeInk Neuro LLC as issuer)",
+                    "One-pager: what Gamma does, traction to date, ask ($150K at $3M cap), close date August 1, your contact",
+                    "Pitch deck with verified numbers only",
+                    "LifeInk Neuro LLC bank account details and wire instructions",
+                    "Cap table showing current state (100% Nisha, pre-investment)",
+                  ]
+                },
+                {
+                  section: "Answers to have ready",
+                  items: [
+                    "What is the money for? Phase 2 study completion, 12-month runway, infrastructure. Be specific.",
+                    "When will you raise again? Pre-seed target after Phase 2 data, late 2026 or early 2027.",
+                    "What happens if you never raise a priced round? Convertible note: maturity date forces resolution. SAFE: sits indefinitely, no repayment obligation, no return for investor.",
+                    "What is your exit path? Consumer app acquisition target, B2B licensing, or IPO if dataset scales.",
+                  ]
+                },
+                {
+                  section: "What to ask each investor",
+                  items: [
+                    "What instrument do you prefer - SAFE or convertible note? Never push one over the other.",
+                    "What check size are you comfortable with?",
+                    "Do you want pro-rata rights to invest in future rounds?",
+                    "Any questions about the terms before I send the document?",
+                    "What is your expected timeline to wire once you sign?",
+                  ]
+                },
+              ].map(({ section, items }) => (
+                <div key={section}>
+                  <p className="text-xs font-medium text-foreground mb-3">{section}</p>
+                  <div className="space-y-2">
+                    {items.map((item, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="size-4 rounded border border-border bg-background shrink-0 mt-0.5" />
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Ed's guidance</p>
+            <p className="text-xs text-muted-foreground mb-5 leading-relaxed">Practical F&F advice from Ed Kang, your Startups.com advisor.</p>
+            <div className="space-y-3">
+              {[
+                { label: "On close date", text: "Set it at 60 days from first outreach. I am closing August 1 because the study starts mid-August is honest and specific. Put the date in the one-pager." },
+                { label: "On instrument choice", text: "Never push one instrument over another. Ask what the investor wants. If they have no preference, explain both. Ed prefers convertibles for F&F for investor protection reasons but institutional investors are fine with SAFEs." },
+                { label: "On lawyer stall", text: "Send the SAFE before the call with a note: this is the YC standard 5-page template used by thousands of startups. Happy to connect you with my attorney if helpful." },
+                { label: "On verbal yes going quiet", text: "Treat verbal interest as a signal, not a close. One warm follow-up if someone goes quiet, then move on. The relationship is worth more than the check." },
+                { label: "On explaining the SAFE", text: "One sentence: You are giving me $10K today. When Gamma raises its next priced round, you get shares at a discount to what those investors pay, based on a $3M cap." },
+                { label: "On closing cleanly", text: "A clean F&F round stops looking like a cap table risk and starts looking like founder conviction once you show up with paying customers and closed notes on clear terms." },
+                { label: "On financials pre-revenue", text: "Never include financials when you have no revenue. But have a 3-year model ready for due diligence showing revenue, CAC, LTV, and path to $20K MRR. One page but be ready to back it up." },
+                { label: "On social yes vs real yes", text: "People say yes in a social context because saying no to a friend is uncomfortable. Give explicit permission to decline upfront: I completely understand if the timing or risk level is not right. It feels counterintuitive but improves your close rate." },
+              ].map(({ label, text }) => (
+                <div key={label} className="rounded-lg border border-border bg-card p-4">
+                  <p className="text-[11px] font-medium text-primary mb-1.5">{label}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       )}
     </main>

@@ -30,6 +30,213 @@ const SCENARIOS = [
 ]
 
 const DEFS = [
+  // FUNDING STAGES
+  {
+    category: "Funding stages",
+    term: "FFF - Friends, Family and Fools",
+    plain: "The very first people who give you money. They invest because they trust you personally, not because they have evaluated your business. Called fools because investing this early is so risky that only someone who loves you or believes in you blindly would do it.",
+    body: "The informal round before any formal fundraising. No standard terms, no institutional investors. Pure personal trust.",
+    founder: "Your F&F round is technically FFF. The people writing checks know you, not the business.",
+    investor: "You are investing in a person and a vision, not a proven business. Highest risk, highest potential return.",
+    best_for: "First $10K-$250K before any external validation.",
+  },
+  {
+    category: "Funding stages",
+    term: "Pre-seed",
+    plain: "The first time a stranger invests in your company. They are not your friend or family. They are a professional investor or angel who believes in your idea early. Usually happens before you have paying customers.",
+    body: "First institutional or angel money. Typically $250K-$2M on a SAFE. Investors are betting on the founder and the problem, not revenue. Median valuation cap $7.7M (PitchBook Q3 2025).",
+    founder: "This is where Gamma is headed after F&F closes. Gate: Phase 2 data showing R2 > 0.3 and app live with paying users.",
+    investor: "Higher risk than seed but better entry price. You are buying conviction before the market prices it in.",
+    best_for: "Pre-revenue startups with validated problem and working prototype.",
+  },
+  {
+    category: "Funding stages",
+    term: "Seed",
+    plain: "The first significant round from professional investors. By this point you usually have some customers and proof the product works. Think of it as the round that funds you to find product market fit.",
+    body: "Typically $2M-$5M priced equity round. Median pre-money $16M (Carta 2025). Median raise $4M. Investors want early revenue ($5K-$50K MRR), real users, and retention data.",
+    founder: "Gamma seed round is gated on $20K MRR milestone. Target mid-2027.",
+    investor: "First priced round. You get preferred stock with liquidation preferences. More protection than a SAFE.",
+    best_for: "Companies with early revenue, proven retention, and clear growth path.",
+  },
+  {
+    category: "Funding stages",
+    term: "Series A, B, C",
+    plain: "Each letter represents a bigger round as the company grows. Series A is when you have proven the business works and need money to scale it. Series B is when you are scaling fast. Series C is when you are big and preparing for an exit or IPO.",
+    body: "Series A median $47.9M pre-money, $12M raise (Carta 2025). Requires $1M-$3M ARR, repeatable growth, clear GTM. Series B median $118.9M. Series C+ leads toward IPO or acquisition.",
+    founder: "Series A for Gamma is targeted 2028-2029, gated on $1M ARR and B2B deal signed.",
+    investor: "Full due diligence, board representation, anti-dilution, pro-rata rights. These are institutional rounds.",
+    best_for: "Companies with proven product market fit scaling revenue.",
+  },
+  // INSTRUMENTS
+  {
+    category: "Instruments",
+    term: "SAFE - Simple Agreement for Future Equity",
+    plain: "Not a loan. Not shares. A promise. Someone gives you money today and you promise them shares later when you raise a real priced round. Simple, fast, no interest, no repayment deadline. Like a voucher for future ownership.",
+    body: "Created by YC in 2013. Now used in 92% of pre-priced rounds (Carta Q3 2025). Converts automatically at next priced round. Post-money SAFE gives investor a fixed ownership percentage at conversion.",
+    founder: "Cleanest F&F instrument. No debt, no deadline, no pressure. If you never raise again you owe nothing.",
+    investor: "No repayment rights if company fails to raise. Money is locked until a priced round happens. No interest.",
+    best_for: "Pre-seed and F&F rounds under $500K.",
+  },
+  {
+    category: "Instruments",
+    term: "CN - Convertible Note",
+    plain: "Similar to a SAFE but structured as a loan first. It has an interest rate, a repayment deadline called a maturity date, and converts to shares when you raise a priced round. Slightly more protection for the investor because if the company never raises again, they can ask for their money back.",
+    body: "Has interest (typically 5-8%), maturity date (12-24 months), valuation cap and/or discount. Technically debt until conversion. Gamma's current F&F instrument.",
+    founder: "Interest accrues as additional dilution. Maturity date creates a hard deadline. More investor-protective than SAFE.",
+    investor: "Repayment rights if no priced round by maturity date. Interest accrues to your benefit. More protection than a SAFE.",
+    best_for: "F&F investors who want debt protections or are uncomfortable with SAFEs.",
+  },
+  {
+    category: "Instruments",
+    term: "MFN - Most Favored Nation",
+    plain: "A protection clause for early investors. It says: if you give any future investor better terms than you gave me, I automatically get those better terms too. Protects early believers from being disadvantaged by later deals.",
+    body: "If a future SAFE or note has a higher cap or bigger discount, MFN holders automatically upgrade to match. Common in SAFEs.",
+    founder: "Can create surprises. If you raise a future tranche at a $5M cap, all MFN investors at $3M automatically get $5M. Think carefully before offering to all F&F investors.",
+    investor: "Protects against founder giving better terms to a later investor without your knowledge.",
+    best_for: "Angels investing $25K+. Consider carefully before offering to all F&F investors.",
+  },
+  {
+    category: "Instruments",
+    term: "Pro-rata rights",
+    plain: "The right to invest in your next round to avoid getting diluted. If an investor owns 5% of your company today and you raise more money, their 5% shrinks unless they put in more money. Pro-rata gives them the right to invest enough to keep their percentage the same.",
+    body: "Not automatic. Must be exercised at each round. Without pro-rata, a 5% F&F stake dilutes to roughly 2% by Series A.",
+    founder: "Only offer to investors who will actually write follow-on checks. Reserves a slot in every future round.",
+    investor: "Essential for protecting your position long term. Critical at seed and Series A.",
+    best_for: "Investors writing $25K+ checks. Standard at seed and Series A.",
+  },
+  // CAP TABLE
+  {
+    category: "Cap table",
+    term: "LP - Limited Partner",
+    plain: "A passive investor in a venture fund. They put money into the fund but do not make decisions about which companies to invest in. Think of them as silent backers.",
+    body: "LPs provide the capital that VCs invest. Pension funds, university endowments, family offices, and wealthy individuals are common LPs.",
+    founder: "You will not interact with LPs directly. They are behind the VC you are pitching.",
+    investor: "If you invest via a VC fund rather than personally, you are an LP in that fund.",
+    best_for: "Understanding where VC money comes from.",
+  },
+  {
+    category: "Cap table",
+    term: "GP - General Partner",
+    plain: "The person who runs the venture fund and decides which startups to invest in. They manage the LP money and take a percentage of profits.",
+    body: "GPs typically earn 2% management fee annually and 20% carried interest (profit share). When a VC gives you a term sheet, the GP is the person signing it.",
+    founder: "You pitch the GP. They decide whether to invest. Build a relationship with the GP, not just the associate.",
+    investor: "If you are investing personally as an angel, you are acting as your own GP.",
+    best_for: "Understanding VC fund structure.",
+  },
+  {
+    category: "Cap table",
+    term: "SPV - Special Purpose Vehicle",
+    plain: "A way to group multiple small investors into one single line on your cap table. Instead of having 20 individual investors each with their own row, an SPV combines them all into one entity. Keeps your cap table clean.",
+    body: "Useful when you have many small F&F investors. One entity holds all their stakes. Reduces cap table complexity for future investors.",
+    founder: "Consider an SPV if you have more than 5-7 F&F investors. Carta and AngelList both offer SPV tools.",
+    investor: "You invest through the SPV entity. Less direct relationship with the company but same economic rights.",
+    best_for: "Rounds with many small investors ($5K-$25K checks).",
+  },
+  {
+    category: "Cap table",
+    term: "ESOP - Employee Stock Option Pool",
+    plain: "Shares set aside to give to employees as part of their compensation. When an employee joins a startup they often get options, the right to buy shares at a fixed price in the future. This is how startups attract talent without paying high salaries.",
+    body: "Typically 10-15% of shares. Created before or during a priced round. Dilutes founders before the round closes. Requires a 409A valuation to set a legal strike price.",
+    founder: "You will need to create an option pool before hiring your technical co-founder on equity. No 409A needed until then.",
+    investor: "Option pool creation dilutes you too. Negotiate it to be sized for actual near-term hiring, not arbitrarily large.",
+    best_for: "Any company hiring employees who will receive equity compensation.",
+  },
+  // VALUATION
+  {
+    category: "Valuation",
+    term: "Pre-money valuation",
+    plain: "What the company is worth before new investment comes in. If your pre-money valuation is $5M and an investor puts in $500K, the company is now worth $5.5M post-money.",
+    body: "Used in priced rounds. The valuation cap on a SAFE or convertible note functions similarly to a pre-money cap but is not exactly the same thing.",
+    founder: "Your $3M cap is not technically a pre-money valuation - it is the maximum conversion price. At pre-seed, you will negotiate an actual pre-money valuation for the first time.",
+    investor: "Lower pre-money = more ownership for the same check size. Your cap protects you by setting a ceiling on the conversion price.",
+    best_for: "Understanding what you are buying into at any priced round.",
+  },
+  {
+    category: "Valuation",
+    term: "Post-money valuation",
+    plain: "What the company is worth after new investment is included. Your $3M valuation cap is a post-money cap, meaning $3M includes the money being invested.",
+    body: "Post-money = pre-money + investment amount. YC standard SAFEs use post-money caps which gives investors a fixed ownership percentage at conversion.",
+    founder: "Post-money SAFE at $3M cap means your F&F investors collectively own $150K/$3M = 5% after conversion. Clear and predictable.",
+    investor: "Post-money cap means you know exactly what % you own at conversion. No surprises from other SAFEs stacking.",
+    best_for: "Post-money is the current standard for SAFEs. Used in all YC standard documents.",
+  },
+  {
+    category: "Valuation",
+    term: "Dilution",
+    plain: "When new shares are created and your ownership percentage shrinks. If you own 100% of a company and you sell 10% to an investor, you are now diluted to 90%. Every time you raise money you get diluted.",
+    body: "Dilution happens at every round. F&F: ~5%. Pre-seed: 10-15%. Seed: ~20%. Series A: ~22%. By Series A, a founder who started at 100% may own 50-60%.",
+    founder: "Dilution is the cost of capital. The goal is to make each round's dilution worth more than it costs - by raising your valuation faster than your ownership shrinks.",
+    investor: "Your ownership also gets diluted at every subsequent round unless you exercise pro-rata rights.",
+    best_for: "Understanding the long-term cost of every check you accept.",
+  },
+  // DUE DILIGENCE
+  {
+    category: "Due diligence",
+    term: "DD - Due Diligence",
+    plain: "The process an investor goes through to verify everything you have told them before writing a check. They check your financials, your legal documents, your product, your team, and your claims. Think of it as a background check on your company.",
+    body: "At F&F stage, due diligence is minimal - investors rely on personal trust. At seed it is moderate - financials, product demo, customer calls. At Series A it is full - legal audit, financial audit, customer interviews, technical review.",
+    founder: "Prepare a simple data room before F&F closes: cap table, signed documents, one-pager, and financial model. Do not wait for investors to ask.",
+    investor: "At F&F stage, your due diligence is the founder's character and the problem's reality. Ask to see the product and talk to one customer.",
+    best_for: "Every stage. The depth increases with check size.",
+  },
+  {
+    category: "Due diligence",
+    term: "Term Sheet",
+    plain: "A short document that outlines the key terms of an investment before the full legal documents are drafted. It is usually non-binding but sets the framework for the deal. Think of it as the outline before the full contract.",
+    body: "Used in priced rounds (Seed, Series A+). Not used in SAFE or convertible note rounds. Key terms: pre-money valuation, investment amount, liquidation preference, anti-dilution, board composition.",
+    founder: "Never accept a term sheet without an attorney reviewing it. The terms set in the term sheet become the deal.",
+    investor: "The term sheet is where you negotiate. Once signed, founders expect you to close on those terms.",
+    best_for: "Seed rounds and above.",
+  },
+  {
+    category: "Due diligence",
+    term: "NDA - Non Disclosure Agreement",
+    plain: "A legal document where someone promises not to share your confidential information. At early stage most investors will not sign an NDA before hearing your pitch because they see hundreds of pitches and cannot risk being locked out of similar companies.",
+    body: "Do not ask VCs or angels to sign NDAs before pitching. It signals inexperience. Your algorithm and data are protected as trade secrets, not by NDA.",
+    founder: "NDA is appropriate for employees, contractors like Mia, and anyone who sees your algorithm or source code. Not for investors hearing a pitch.",
+    investor: "You will not be asked to sign an NDA at F&F stage. If asked, that is a yellow flag about founder sophistication.",
+    best_for: "Employees, contractors, and technical partners - not pitch conversations.",
+  },
+  // EXIT
+  {
+    category: "Exit",
+    term: "Liquidity event",
+    plain: "Any event that turns your equity into actual cash. An IPO is a liquidity event. An acquisition is a liquidity event. Until one of these happens, your shares are just paper. This is why F&F investors cannot cash out whenever they want. They have to wait.",
+    body: "Average time from first funding to liquidity event is 8-12 years. F&F investors are the last to invest and the last to get liquid. The upside is the entry price is lowest.",
+    founder: "Be honest with F&F investors: their money is locked for 5-10 years. No exceptions unless a secondary sale opportunity arises.",
+    investor: "You cannot exit whenever you want. Your only exit paths are: acquisition, IPO, secondary sale (rare at F&F), or company buyback (very rare).",
+    best_for: "Understanding the full timeline of a startup investment.",
+  },
+  {
+    category: "Exit",
+    term: "IPO - Initial Public Offering",
+    plain: "When a private company sells shares to the general public on a stock exchange for the first time. This is how early investors and founders eventually cash out. Think of it as the company graduating from private to public.",
+    body: "Rare outcome. Less than 1% of startups IPO. Requires $100M+ ARR, consistent growth, and institutional investor demand. After IPO, early investors face a lockup period (typically 180 days) before they can sell.",
+    founder: "Not a near-term consideration for Gamma. Focus on acquisition as the more realistic exit path.",
+    investor: "If Gamma IPOs, you cannot sell immediately. 180-day lockup applies. But a $1B IPO on a $3M F&F cap generates extraordinary returns.",
+    best_for: "Understanding the highest-upside but least-likely exit path.",
+  },
+  {
+    category: "Exit",
+    term: "M&A - Mergers and Acquisitions",
+    plain: "When one company buys another or two companies combine. For a startup this is usually an acquisition - a larger company buying you. This is one of the most common exit paths for early stage companies.",
+    body: "Most likely exit path for Gamma. Strategic acquirers include Oura, Apple, Whoop, Garmin - all have wearable interests and no cognitive performance layer. Acquiring Gamma is faster and cheaper than building the dataset from scratch.",
+    founder: "Build toward acquisition by making Gamma strategically valuable to at least 3-4 potential acquirers. The dataset is the asset.",
+    investor: "In an acquisition, you get paid based on your ownership percentage after liquidation preferences are satisfied. F&F investors get their money back first, then share in remaining proceeds.",
+    best_for: "Most likely exit for early stage startups. Typical timeline 5-8 years from first funding.",
+  },
+  {
+    category: "Exit",
+    term: "Acquihire",
+    plain: "When a company buys a startup primarily to hire its team rather than for the product or technology. The product may be shut down but the people are absorbed into the acquiring company.",
+    body: "Common outcome when product has not scaled but team is strong. Returns are typically low - enough to return investor capital but not generate significant multiples.",
+    founder: "Not the goal. Build toward product acquisition, not acquihire. The algorithm and dataset are what make Gamma acquisition-valuable.",
+    investor: "Acquihire returns are often 1-2x at best. Not the outcome you are investing for.",
+    best_for: "Understanding downside scenarios.",
+  },
+]
+
+
   {
     term: "SAFE (Simple Agreement for Future Equity)",
     plain: "You give money today. When the company raises a real funding round, your money turns into shares - at a better price than the new investors pay. No repayment, no deadline, no interest. How good a deal you get depends on three outcomes: (1) Next round is above your cap - cap kicks in, you get more shares per dollar than new investors. This is the good scenario. (2) Next round is at or below your cap - cap does not help, you convert at round price like everyone else. (3) Company never raises a priced round - your SAFE sits indefinitely. No repayment obligation, but no return either. Your money is locked with no path out.",
@@ -374,37 +581,37 @@ export default function FundingPage() {
 
       {tab === "definitions" && (
         <div>
-          <p className="text-xs text-muted-foreground mb-6 leading-relaxed">Plain English explanations of every funding instrument and term. Each entry shows what it means for you as the founder and what it means for your investor.</p>
-          <div className="space-y-0">
-            {DEFS.map((def) => (
-              <div key={def.term} className="py-6 border-b border-border">
-                <p className="text-sm font-medium text-foreground mb-3">{def.term}</p>
-                <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 mb-4">
-                  <p className="text-xs text-foreground/90 leading-relaxed">{def.plain}</p>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{def.body}</p>
-                <div className="space-y-2 mb-3">
-                  <div className="flex items-start gap-3">
-                    <span className="text-[11px] font-medium text-primary shrink-0 min-w-[52px] mt-0.5">Founder</span>
-                    <span className="text-xs text-muted-foreground leading-relaxed">{def.founder}</span>
+          <p className="text-xs text-muted-foreground mb-6 leading-relaxed">Plain English. Every term you will encounter from F&F to exit. Grouped by topic.</p>
+          {["Funding stages", "Instruments", "Cap table", "Valuation", "Due diligence", "Exit"].map((category) => (
+            <div key={category} className="mb-8">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 pb-2 border-b border-border">{category}</p>
+              <div className="space-y-0">
+                {DEFS.filter((d) => d.category === category).map((def) => (
+                  <div key={def.term} className="py-5 border-b border-border last:border-0">
+                    <p className="text-sm font-medium text-foreground mb-3">{def.term}</p>
+                    <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 mb-3">
+                      <p className="text-xs text-foreground/90 leading-relaxed">{def.plain}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-3">{def.body}</p>
+                    <div className="space-y-2 mb-2">
+                      <div className="flex items-start gap-3">
+                        <span className="text-[11px] font-medium text-primary shrink-0 min-w-[52px] mt-0.5">Founder</span>
+                        <span className="text-xs text-muted-foreground leading-relaxed">{def.founder}</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-[11px] font-medium text-green-700 dark:text-green-400 shrink-0 min-w-[52px] mt-0.5">Investor</span>
+                        <span className="text-xs text-muted-foreground leading-relaxed">{def.investor}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-[11px] text-muted-foreground/60 shrink-0 mt-0.5">Best for</span>
+                      <span className="text-[11px] text-muted-foreground leading-relaxed">{def.best_for}</span>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-[11px] font-medium text-green-700 dark:text-green-400 shrink-0 min-w-[52px] mt-0.5">Investor</span>
-                    <span className="text-xs text-muted-foreground leading-relaxed">{def.investor}</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-[11px] text-muted-foreground/60 shrink-0 mt-0.5">Best for</span>
-                  <span className="text-[11px] text-muted-foreground leading-relaxed">{def.best_for}</span>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {tab === "playbook" && (
-        <div className="space-y-10">
-          <p className="text-xs text-muted-foreground">Playbook content loading...</p>
+            </div>
+          ))}
         </div>
       )}
 

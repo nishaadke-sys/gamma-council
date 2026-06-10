@@ -34,6 +34,7 @@ export default function RootLayout({
               Council
             </Link>
             <Link href="/funding" className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Funding</Link>
+            <Link href="/legal" className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Legal</Link>
             <Link href="/knowledge" className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
               Knowledge
             </Link>

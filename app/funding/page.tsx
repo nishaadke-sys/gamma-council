@@ -32,7 +32,7 @@ const SCENARIOS = [
 const DEFS = [
   {
     term: "SAFE (Simple Agreement for Future Equity)",
-    plain: "You hand me $10K today. Nothing happens yet. When I raise a real round from VCs, your $10K automatically turns into shares at a better price than what the VCs pay. No loan to repay, no deadline, no interest.",
+    plain: "You hand me $10K today. Nothing happens yet. When I raise a real round from VCs, your $10K turns into shares. How good a deal you get depends on the valuation at that round. If VCs value Gamma at $10M and your cap was $3M, you convert as if it is still $3M — getting more than 3x the shares per dollar compared to the VCs. But if the VCs value the company at $2M (below your cap), the cap does not help — you just convert at $2M like everyone else. The cap only protects you when the valuation rises above it. No loan to repay, no deadline, no interest.",
     body: "The most common early-stage instrument today, used in 90% of pre-seed deals in 2025. A SAFE is not a loan. It has no interest and no maturity date. It converts automatically when the company raises a priced equity round.",
     founder: "Cleanest structure for F&F. No debt on your balance sheet. No deadline pressure. If you never raise again, you owe nothing. Downside: post-money SAFEs lock in investor ownership percentage, which can dilute you more than expected when multiple SAFEs stack.",
     investor: "You get in early at a favorable valuation. No interest, but also no repayment rights if the company fails. Your money is locked until a priced round happens, which could be 12 months or several years.",

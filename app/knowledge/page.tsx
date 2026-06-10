@@ -1,3 +1,5 @@
+"use client"
+
 
 import { useEffect, useState, useRef } from "react"
 import { Plus, Trash2, Upload, ChevronDown, ChevronUp } from "lucide-react"

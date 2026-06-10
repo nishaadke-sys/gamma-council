@@ -250,6 +250,8 @@ export default function FundingPage() {
           {perspective === "investor" && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">How ownership is calculated</p>
+            </div>
+          </div>
           )}
 
           {perspective === "investor" && (

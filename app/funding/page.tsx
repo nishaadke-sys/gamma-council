@@ -371,6 +371,82 @@ export default function FundingPage() {
           )}
 
           {perspective === "investor" && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">What this investment funds</p>
+              <p className="text-xs text-muted-foreground mb-4 leading-relaxed">The F&F round is raising {fmt(150000)} total. Here is exactly what that capital goes toward, what it unlocks, and what it does not cover.</p>
+              <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+                <div>
+                  <p className="text-xs font-medium text-foreground mb-1">Funded by this round</p>
+                  <p className="text-xs text-muted-foreground mb-3 leading-relaxed">The F&F round gets Gamma to pre-seed readiness. One milestone: Phase 2 complete, app live, first paying users.</p>
+                  <div className="space-y-0 divide-y divide-border rounded-lg border border-border overflow-hidden">
+                    {[
+                      { category: "Phase 2 study", items: ["30 participants across 2 cohorts", "15 Muse 2 devices (shipped to Murcia)", "Participant compensation: EUR 3 x 2,520 sessions = EUR 7,560", "Mia Micevska: Phase 2 protocol execution and M2 model analysis"], amount: "$27K", pct: "18%" },
+                      { category: "Product development", items: ["iOS App Store submission and launch - October 2026", "Delete Account flow (Apple 5.1.1v requirement)", "StoreKit paywall integration", "BLE reset bug fix for back-to-back sessions", "Backend scaling for volunteer data load"], amount: "$25K", pct: "17%" },
+                      { category: "Go-to-market", items: ["Waitlist activation and founding 100 cohort", "Community seeding in Lisbon coworking spaces", "App Store acquisition - $15 CPA target", "Muse affiliate program (10% commission via choosemuse.com)"], amount: "$15K", pct: "10%" },
+                      { category: "Operations and runway", items: ["12-month operating burn at EUR 700/month", "Railway infrastructure, SendGrid, Apple Developer", "Legal fees: note templates, IP assignment, attorney review"], amount: "$13K", pct: "9%" },
+                      { category: "Continued research reserve", items: ["Bridge funding to pre-seed close", "M2 model development post Phase 2", "Signal processing improvements and algorithm iteration", "Unexpected study costs and contingency"], amount: "$70K", pct: "46%" },
+                    ].map(({ category, items, amount, pct }) => (
+                      <div key={category} className="p-4 bg-card">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-medium text-foreground">{category}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-muted-foreground">{pct}</span>
+                            <span className="text-xs font-medium text-foreground">{amount}</span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          {items.map((item) => (
+                            <div key={item} className="flex items-start gap-2">
+                              <span className="size-1 rounded-full bg-muted-foreground/40 shrink-0 mt-1.5" />
+                              <p className="text-[11px] text-muted-foreground leading-relaxed">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    <div className="p-4 bg-muted/50 flex items-center justify-between">
+                      <p className="text-xs font-medium text-foreground">Total F&F raise</p>
+                      <p className="text-xs font-medium text-foreground">$150K</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs font-medium text-foreground mb-2">What it unlocks</p>
+                  <div className="space-y-1.5">
+                    {[
+                      "M2 model trained on 30-person cohort data - cross-person generalization test",
+                      "First paying consumer app users - October 2026 launch",
+                      "Pre-seed raise eligibility - gated on Phase 2 R2 > 0.3 and app live",
+                      "B2B licensing conversations - contingent on Phase 2 validation",
+                    ].map((item) => (
+                      <div key={item} className="flex items-start gap-2">
+                        <span className="size-1.5 rounded-full bg-green-600 shrink-0 mt-1.5" />
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs font-medium text-foreground mb-2">Not covered by this round</p>
+                  <div className="space-y-1.5">
+                    {[
+                      "Technical co-founder salary - funded at pre-seed",
+                      "Marketing spend and paid acquisition - funded at pre-seed",
+                      "Full legal fees for pre-seed round - funded at pre-seed",
+                      "Clinical validation or regulatory approval - Series A and beyond",
+                    ].map((item) => (
+                      <div key={item} className="flex items-start gap-2">
+                        <span className="size-1.5 rounded-full bg-muted-foreground/40 shrink-0 mt-1.5" />
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {perspective === "investor" && (
             <div className="space-y-5">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Your ownership as Gamma grows</p>

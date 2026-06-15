@@ -2,263 +2,485 @@
 
 import { useState } from "react"
 
-const STAGES = [
+const PHASES = [
   {
     id: "ff",
-    label: "F&F",
-    sublabel: "Now - August 1 2026",
+    label: "F&F Close",
+    sublabel: "Now - Aug 1 2026",
     status: "active",
-    target: "$150K",
-    valuation: "$3M cap",
-    instrument: "Convertible note",
-    dilution: "~5%",
-    gamma: {
-      goal: "Close $150K from friends and family. Fund Phase 2 completion and 12-month runway.",
-      milestone: "Signed notes from all 7 investors. Wires received in LifeInk Neuro LLC by August 1.",
-      gate: "You are here. Round in progress.",
-    },
-    what: "Friends, family, and close personal network. People who invest in YOU, not the business. Check sizes $10K-$50K. No institutional investors at this stage.",
-    instrument_detail: "Convertible note at $3M cap, 5% interest, 18-month conversion window. YC standard template. No lawyer required to execute. Electronic signatures valid.",
-    investors: [
-      { name: "Friends and family", description: "Personal network. No formal process needed." },
-      { name: "Angel investors", description: "Individuals investing personal capital. AngelList, LinkedIn, Neurofounders community." },
+    goal: "Close $150K from 6 investors. Wire all funds into LifeInk Neuro LLC by August 1.",
+    confirmed: "$10K confirmed. $140K gap.",
+    links: [
+      { label: "Investor CRM", href: "/crm" },
+      { label: "Talk Track", href: "/talktrack" },
+      { label: "Funding", href: "/funding" },
+      { label: "Legal OS", href: "/legal" },
     ],
-    sources: [
-      { label: "YC SAFE and note templates", url: "https://www.ycombinator.com/documents" },
-      { label: "Regulation D Rule 506(b)", url: "https://www.sec.gov/education/smallbusiness/exemptions/regD" },
+    weeks: [
+      {
+        week: "Week 1",
+        dates: "Jun 15 - Jun 21",
+        focus: "Activate every conversation",
+        tasks: [
+          { task: "Send Saurabh the financials doc and ask if he can go above $10K", solo: true, tool: "Funding > Financials" },
+          { task: "Start FEMA compliance review for both India uncles immediately - takes 2-4 weeks regardless of yes", solo: false, who: "CA or attorney in India", tool: "Legal OS" },
+          { task: "Call Pranav Pandit - first conversation, use Talk Track", solo: true, tool: "Talk Track" },
+          { task: "Call Lav Kumar - first conversation, use Talk Track", solo: true, tool: "Talk Track" },
+          { task: "Follow up with brother on capacity - does he want in and at what amount", solo: true, tool: null },
+          { task: "Send convertible note template to any investor who says verbal yes within 24 hours", solo: true, tool: "Legal OS" },
+        ],
+        calendar: "Jun 15 - Jun 21 2026",
+        doNotTouch: "Do not start Phase 2 prep this week. F&F close is the only priority.",
+      },
+      {
+        week: "Week 2",
+        dates: "Jun 22 - Jun 28",
+        focus: "Follow up and send documents",
+        tasks: [
+          { task: "Follow up with Saurabh on financials - does he want to go higher than $10K", solo: true, tool: "CRM" },
+          { task: "Follow up with Pranav Pandit and Lav Kumar - send note document to anyone who said yes", solo: true, tool: "Talk Track" },
+          { task: "Check FEMA compliance status for both uncles", solo: false, who: "India CA/attorney", tool: "Legal OS" },
+          { task: "Call both India uncles if FEMA process is underway", solo: true, tool: "Talk Track" },
+          { task: "Update CRM with status for every investor after each conversation", solo: true, tool: "CRM" },
+        ],
+        calendar: "Jun 22 - Jun 28 2026",
+        doNotTouch: "One warm follow-up maximum per investor this week. Do not chase.",
+      },
+      {
+        week: "Week 3",
+        dates: "Jun 29 - Jul 5",
+        focus: "Get signatures on all verbal yeses",
+        tasks: [
+          { task: "Chase any unsigned documents - send reminder to anyone who has not countersigned within 5 days", solo: true, tool: "CRM" },
+          { task: "For anyone who has gone quiet - one final warm follow-up then move on", solo: true, tool: "Talk Track" },
+          { task: "Confirm wire details for all signed investors", solo: true, tool: "CRM" },
+          { task: "Check if Varun Gulati soft no has changed - if not, move on", solo: true, tool: "CRM" },
+        ],
+        calendar: "Jun 29 - Jul 5 2026",
+        doNotTouch: "Do not add new investors at this stage. Close what you have.",
+      },
+      {
+        week: "Week 4",
+        dates: "Jul 6 - Jul 12",
+        focus: "Wire collection begins",
+        tasks: [
+          { task: "All signed investors should wire by July 12 to allow processing time before Aug 1", solo: true, tool: "CRM" },
+          { task: "Send wire instructions to every signed investor", solo: true, tool: "CRM" },
+          { task: "Confirm India wires are in compliance review and on track", solo: false, who: "India CA/attorney", tool: "Legal OS" },
+          { task: "Update cap table after each wire received", solo: true, tool: "Funding" },
+        ],
+        calendar: "Jul 6 - Jul 12 2026",
+        doNotTouch: "Do not wait until August to chase wires. Banks are slow.",
+      },
+      {
+        week: "Week 5",
+        dates: "Jul 13 - Jul 19",
+        focus: "Chase stragglers",
+        tasks: [
+          { task: "Any investor not wired by July 13 gets a direct chase - deadline is real", solo: true, tool: "CRM" },
+          { task: "India wires: confirm they are processing and have reference numbers", solo: false, who: "India CA/attorney", tool: "Legal OS" },
+          { task: "Assess: are you on track for $150K or do you need to activate Anisha Rachit backup", solo: true, tool: "CRM" },
+        ],
+        calendar: "Jul 13 - Jul 19 2026",
+        doNotTouch: "Do not start new investor conversations. You are in collection mode.",
+      },
+      {
+        week: "Week 6",
+        dates: "Jul 20 - Aug 1",
+        focus: "Close cleanly",
+        tasks: [
+          { task: "All wires received into LifeInk Neuro LLC by August 1", solo: true, tool: "CRM" },
+          { task: "Send closing email to all investors confirming their stake and next steps", solo: true, tool: null },
+          { task: "Final cap table update with all investors, amounts, dates", solo: true, tool: "Funding" },
+          { task: "Update pitch deck: Bootstrapped to F&F funded $150K raised", solo: true, tool: null },
+          { task: "Announce to Ed Kang - round is closed, ask about activating investor matching tool", solo: true, tool: null },
+        ],
+        calendar: "Jul 20 - Aug 1 2026",
+        doNotTouch: "Do not start pre-seed conversations until F&F is fully closed and wired.",
+      },
     ],
-    benchmarks: "Typical F&F round: $25K-$250K. Median cap: $2M-$4M for pre-revenue. Your $3M cap is at market.",
+    gaps: [
+      { gap: "FEMA compliance for India wires", solo: false, who: "CA or attorney based in India", how: "Ask your uncles for a referral to their CA before the conversation. Start the process before they say yes - it takes 2-4 weeks." },
+      { gap: "Convertible note legal review", solo: false, who: "Delaware attorney", how: "One-time review of the YC standard template. Cost $500-$1,500. Ed Kang can refer. Do this before sending to any investor." },
+      { gap: "Brother: no formal note needed but equity reserved", solo: true, who: "You alone", how: "Decide the amount and keep a written record even if informal. You need documentation for the pre-seed cap table." },
+    ],
+  },
+  {
+    id: "phase2",
+    label: "Phase 2",
+    sublabel: "Jun 21 - Aug 15 2026",
+    status: "active",
+    goal: "30 participants, 2 cohorts, 2,520 EEG sessions. M2 model validation data collected.",
+    confirmed: "Cohort 1 starts June 21. 15 Muse 2 devices shipped to Murcia.",
+    links: [
+      { label: "Knowledge Base", href: "/knowledge" },
+      { label: "Legal OS", href: "/legal" },
+    ],
+    weeks: [
+      {
+        week: "Week 1",
+        dates: "Jun 21 - Jun 28",
+        focus: "Cohort 1 kickoff",
+        tasks: [
+          { task: "Cohort 1 starts June 21 - confirm all 15 participants have received Muse 2 devices", solo: true, tool: "Knowledge Base" },
+          { task: "Confirm 24h ambient wearable data collection is running for all participants - critical design requirement", solo: false, who: "Mia Micevska", tool: "Knowledge Base" },
+          { task: "Fix back-to-back session BLE reset bug before participants start", solo: false, who: "iOS engineer or Claude Code", tool: null },
+          { task: "Monitor study backend - gammacog.com/study/admin", solo: true, tool: null },
+        ],
+        calendar: "Jun 21 - Jun 28 2026",
+        doNotTouch: "Do not change session protocol mid-cohort.",
+      },
+      {
+        week: "Week 2-3",
+        dates: "Jun 29 - Jul 11",
+        focus: "Cohort 1 in progress",
+        tasks: [
+          { task: "Monitor daily session completion rates in study admin dashboard", solo: true, tool: null },
+          { task: "Flag any participant with <3 sessions per day to Mia immediately", solo: true, tool: null },
+          { task: "Confirm Apple Watch and Oura data is syncing correctly for all participants", solo: true, tool: null },
+          { task: "Resolve Mia open questions: ADHD exclusion, left-handedness protocol, low-CCS intervention timing", solo: false, who: "Mia Micevska", tool: "Knowledge Base" },
+        ],
+        calendar: "Jun 29 - Jul 11 2026",
+        doNotTouch: "Do not change EEG protocol mid-study.",
+      },
+      {
+        week: "Week 4",
+        dates: "Jul 12 - Jul 18",
+        focus: "Cohort 2 kickoff",
+        tasks: [
+          { task: "Cohort 2 starts July 12 - onboard 15 new participants", solo: true, tool: null },
+          { task: "Cohort 1 completes July 12 - confirm all session data is saved", solo: true, tool: null },
+          { task: "Begin preliminary data review with Mia on Cohort 1 data", solo: false, who: "Mia Micevska", tool: null },
+        ],
+        calendar: "Jul 12 - Jul 18 2026",
+        doNotTouch: null,
+      },
+      {
+        week: "Week 5-6",
+        dates: "Jul 19 - Aug 1",
+        focus: "Cohort 2 in progress, data collection",
+        tasks: [
+          { task: "Monitor Cohort 2 session completion", solo: true, tool: null },
+          { task: "Confirm 24h ambient data is complete for Cohort 1 before analysis begins", solo: false, who: "Mia Micevska", tool: null },
+          { task: "Close F&F round by August 1 simultaneously", solo: true, tool: "CRM" },
+        ],
+        calendar: "Jul 19 - Aug 1 2026",
+        doNotTouch: null,
+      },
+      {
+        week: "Week 7-8",
+        dates: "Aug 1 - Aug 15",
+        focus: "Cohort 2 complete, analysis begins",
+        tasks: [
+          { task: "Cohort 2 completes August 15 - confirm all data collected", solo: true, tool: null },
+          { task: "Begin M2 model analysis with Mia - 24h pre-session features vs CCS", solo: false, who: "Mia Micevska", tool: null },
+          { task: "Primary endpoint check: LODO R2 > 0.3 on 24h pre-session wearable features", solo: false, who: "Mia Micevska", tool: null },
+        ],
+        calendar: "Aug 1 - Aug 15 2026",
+        doNotTouch: null,
+      },
+    ],
+    gaps: [
+      { gap: "24h ambient data collection fix", solo: false, who: "iOS/backend engineer or Claude Code", how: "This must be fixed before Phase 2 starts. It is the critical design requirement. Tell Claude Code to fix this first." },
+      { gap: "BLE reset bug for back-to-back sessions", solo: false, who: "iOS engineer or Claude Code", how: "Breaks volunteer experience. Fix before June 21." },
+      { gap: "Stroop session_id NULL fix", solo: false, who: "Backend engineer or Claude Code", how: "Prevents automated pairing. Fix before Phase 2 data analysis." },
+      { gap: "M2 model analysis (XGBoost)", solo: false, who: "Mia Micevska", how: "Mia owns the analysis. You provide the data pipeline and clean exports. Confirm her availability for August." },
+      { gap: "Open questions from Mia", solo: false, who: "Mia Micevska", how: "ADHD/OCD exclusion, left-handedness, low-CCS rotating prompt. Reply to Mia before PR #6 can merge." },
+    ],
+  },
+  {
+    id: "launch",
+    label: "App Launch",
+    sublabel: "Aug - Oct 2026",
+    status: "upcoming",
+    goal: "iOS app live in App Store by October 2026. Founding 100 cohort converted to paying subscribers.",
+    confirmed: "Build 41 in TestFlight. Delete Account flow and StoreKit paywall still needed for App Store.",
+    links: [
+      { label: "Financials", href: "/funding" },
+    ],
+    weeks: [
+      {
+        week: "August",
+        dates: "Aug 1 - Aug 31",
+        focus: "App Store submission prep",
+        tasks: [
+          { task: "Build Delete Account flow (Apple 5.1.1v requirement - hard requirement for App Store)", solo: false, who: "iOS engineer or Claude Code", tool: null },
+          { task: "Build 21-day free trial paywall with StoreKit integration", solo: false, who: "iOS engineer or Claude Code", tool: null },
+          { task: "QA via bluepixel-qa branch", solo: false, who: "Bluepixel QA contractor", tool: null },
+          { task: "Submit to App Store for review", solo: true, tool: null },
+        ],
+        calendar: "Aug 1 - Aug 31 2026",
+        doNotTouch: "Do not launch to public until App Store approval.",
+      },
+      {
+        week: "September",
+        dates: "Sep 1 - Sep 30",
+        focus: "Soft launch and founding 100",
+        tasks: [
+          { task: "App Store approval expected - monitor review status", solo: true, tool: null },
+          { task: "Activate founding 100 waitlist - convert Phase 2 participants first (target 20 of 30)", solo: true, tool: "Financials" },
+          { task: "Begin community seeding in Lisbon (FitnessUp, MVMT, Matchbox Gym, digital nomad Slack groups)", solo: true, tool: null },
+          { task: "D7 visa renewal appointment September 4 with AIMA - confirm NovoBanco balance EUR 11,040 minimum", solo: true, tool: "Legal OS" },
+        ],
+        calendar: "Sep 1 - Sep 30 2026",
+        doNotTouch: null,
+      },
+      {
+        week: "October",
+        dates: "Oct 1 - Oct 31",
+        focus: "Public launch",
+        tasks: [
+          { task: "Public launch - founding 100 cohort converts to paying subscribers", solo: true, tool: "Financials" },
+          { task: "Target: 20 paying subscribers by end of October", solo: true, tool: "Financials" },
+          { task: "Begin clinical referral channel through Mia network at Brainstim and Xiberlinc", solo: false, who: "Mia Micevska", tool: null },
+          { task: "Open pre-seed conversations with first angels", solo: true, tool: "Roadmap" },
+        ],
+        calendar: "Oct 1 - Oct 31 2026",
+        doNotTouch: null,
+      },
+    ],
+    gaps: [
+      { gap: "Delete Account flow (App Store 5.1.1v)", solo: false, who: "iOS engineer or Claude Code", how: "Hard Apple requirement. Cannot submit without it. Highest priority build task in August." },
+      { gap: "StoreKit paywall integration", solo: false, who: "iOS engineer or Claude Code", how: "Required for paid subscriptions. Build in August alongside Delete Account." },
+      { gap: "App Store QA", solo: false, who: "Bluepixel QA contractor", how: "Required before submission. Restore CLAUDE.md from repo before giving access." },
+      { gap: "Clinical referral channel", solo: false, who: "Mia Micevska", how: "Mia's network at Brainstim and Xiberlinc. Coordinate with her in September." },
+    ],
   },
   {
     id: "preseed",
     label: "Pre-seed",
-    sublabel: "Late 2026 - early 2027",
-    status: "next",
-    target: "$500K-$1.5M",
-    valuation: "$6M-$10M cap",
-    instrument: "SAFE (post-money)",
-    dilution: "10-15%",
-    gamma: {
-      goal: "Fund consumer app launch, first hires, and M2 model development.",
-      milestone: "Phase 2 data showing R2 > 0.3. Consumer app live with paying users. $5K-$10K MRR.",
-      gate: "Gated on Phase 2 results (August 2026) and app launch (October 2026).",
-    },
-    what: "Angel investors, micro-VCs, and pre-seed funds. Check sizes $25K-$500K. You need a lead investor who sets terms and others follow.",
-    instrument_detail: "Post-money SAFE is the standard at pre-seed in 2026. 90% of pre-seed rounds use SAFEs. No interest, no maturity date. Cap typically 1.5-2x your F&F cap. $8M-$10M cap is reasonable with Phase 2 data and paying users.",
-    investors: [
-      { name: "Neurotech angels", description: "Ariel Garten (Interaxon), Amy Kruse (Satori), neurotech-adjacent angels." },
-      { name: "Health tech micro-VCs", description: "Firms writing $100K-$500K checks in digital health and wearables." },
-      { name: "Startups.com matching", description: "Activate after F&F closes per Ed Kang guidance." },
+    sublabel: "Oct 2026 - Apr 2027",
+    status: "upcoming",
+    goal: "$500K raise. Close April 2027. Gate: Phase 2 data showing R2 > 0.3 and app live with paying users.",
+    confirmed: "Not started. Activate investor matching tool only after F&F is fully closed per Ed Kang.",
+    links: [
+      { label: "Funding", href: "/funding" },
+      { label: "Roadmap", href: "/roadmap" },
     ],
-    sources: [
-      { label: "Carta state of pre-seed Q1 2026", url: "https://carta.com/data/state-of-pre-seed-q1-2026/" },
-      { label: "AngelList raise", url: "https://www.angellist.com/raise" },
-      { label: "Startups.com investor matching", url: "https://www.startups.com" },
+    weeks: [
+      {
+        week: "Oct - Nov 2026",
+        dates: "Oct - Nov 2026",
+        focus: "Build pre-seed pipeline",
+        tasks: [
+          { task: "Activate Startups.com investor matching tool - only after F&F fully closed", solo: true, tool: "Funding" },
+          { task: "Reach out to Neurofounders for founder feature/interview", solo: true, tool: null },
+          { task: "Apply to NVIDIA Inception program", solo: true, tool: "Roadmap" },
+          { task: "Target: 100 paying subscribers ($999 MRR) by December 2026 to open pre-seed conversations", solo: true, tool: "Financials" },
+        ],
+        calendar: "Oct 1 - Nov 30 2026",
+        doNotTouch: "Do not pitch institutional investors without Phase 2 data and live paying users.",
+      },
+      {
+        week: "Dec 2026 - Feb 2027",
+        dates: "Dec 2026 - Feb 2027",
+        focus: "Active pre-seed conversations",
+        tasks: [
+          { task: "100 subscribers milestone opens pre-seed conversations", solo: true, tool: "Financials" },
+          { task: "Pitch neurotech angels: Ariel Garten, Amy Kruse and network", solo: true, tool: "Talk Track" },
+          { task: "Flip to Delaware C-Corp before first institutional investor signs", solo: false, who: "Delaware attorney", tool: null },
+          { task: "Create option pool and 409A valuation before any equity offers to Mia or co-founder", solo: false, who: "Attorney and 409A provider", tool: "Legal OS" },
+          { task: "Target: 300 paying subscribers ($2,997 MRR) by February 2027", solo: true, tool: "Financials" },
+        ],
+        calendar: "Dec 1 2026 - Feb 28 2027",
+        doNotTouch: null,
+      },
+      {
+        week: "Mar - Apr 2027",
+        dates: "Mar - Apr 2027",
+        focus: "Close pre-seed",
+        tasks: [
+          { task: "Pre-seed closes April 2027 - $500K target", solo: true, tool: "Funding" },
+          { task: "Hire technical co-founder with EEG/ML/biosignal expertise post-funding", solo: false, who: "Technical co-founder", tool: null },
+          { task: "Mia joins full time as CTO post-funding", solo: false, who: "Mia Micevska", tool: null },
+        ],
+        calendar: "Mar 1 - Apr 30 2027",
+        doNotTouch: null,
+      },
     ],
-    benchmarks: "2026 median pre-seed: $500K-$1M raise. Median val cap: $10M for $250K-$1M rounds (Carta Q1 2026). Bar is higher than 2024 - investors want traction even pre-revenue.",
+    gaps: [
+      { gap: "Technical co-founder", solo: false, who: "ML engineer with EEG/biosignal expertise, ideally Lisbon-based", how: "Start search now via YC co-founder matching, Entrepreneur First, LinkedIn neurotech groups. Do not wait until pre-seed closes." },
+      { gap: "Delaware C-Corp conversion", solo: false, who: "Delaware attorney", how: "Stripe Atlas ($500) or Clerky ($399) for incorporation. Do before first institutional investor." },
+      { gap: "409A valuation", solo: false, who: "409A provider ($2K-$5K)", how: "Required before any stock options issued. Do before hiring technical co-founder on equity." },
+      { gap: "Pitch coaching", solo: false, who: "Ed Kang (Startups.com)", how: "Ed is already your advisor. Use him for pre-seed pitch prep. Activate after F&F closes." },
+    ],
   },
   {
-    id: "seed",
-    label: "Seed",
-    sublabel: "Mid 2027",
+    id: "scale",
+    label: "Scale",
+    sublabel: "Apr 2027 - Nov 2027",
     status: "future",
-    target: "$2M-$5M",
-    valuation: "$15M-$25M pre-money",
-    instrument: "Priced equity",
-    dilution: "15-25%",
-    gamma: {
-      goal: "Scale consumer app, build data science team, validate B2B licensing model.",
-      milestone: "$20K MRR. M2 model validated. Clear B2B pipeline.",
-      gate: "Gated on $20K MRR milestone. This is your seed round trigger.",
-    },
-    what: "Seed-stage VCs, strategic angels, and corporate venture arms. Lead investor takes 10-20% ownership and typically gets a board observer seat. Round takes 6-12 weeks to close.",
-    instrument_detail: "First priced round. Investors receive preferred stock with liquidation preferences. You will need a 409A valuation, option pool (10-15%), and a Delaware C-Corp. Term sheet review by attorney is required. Legal fees $15K-$40K.",
-    investors: [
-      { name: "Digital health seed funds", description: "Rock Health, 8VC, Andreessen Horowitz Bio, General Catalyst Health." },
-      { name: "Neurotech VCs", description: "Khosla Ventures, Founders Fund, Lux Capital - all have neurotech portfolio companies." },
-      { name: "Corporate venture", description: "Samsung NEXT, Qualcomm Ventures, Garmin Ventures - all have wearable interests." },
+    goal: "1,000 paying subscribers ($9,990 MRR) by June 2027. Breakeven at 1,789 subscribers by November 2027.",
+    confirmed: "Gated on pre-seed close and technical co-founder hire.",
+    links: [
+      { label: "Financials", href: "/funding" },
     ],
-    sources: [
-      { label: "Rock Health", url: "https://rockhealth.com" },
-      { label: "Seed round benchmarks 2026", url: "https://www.pitchwise.se/blog/the-complete-guide-to-seed-and-series-funding-rounds-for-founders-in-2026" },
-      { label: "Carta seed data", url: "https://carta.com/data" },
+    weeks: [
+      {
+        week: "Apr - Jun 2027",
+        dates: "Apr - Jun 2027",
+        focus: "Scale to 1,000 subscribers",
+        tasks: [
+          { task: "Open paid acquisition channels post pre-seed (CAC target $20)", solo: false, who: "Growth hire or agency", tool: "Financials" },
+          { task: "Technical co-founder starts - hand off signal processing pipeline", solo: false, who: "Technical co-founder", tool: null },
+          { task: "Mia leads Phase 3 study design with larger cohort", solo: false, who: "Mia Micevska", tool: null },
+          { task: "Target: 1,000 paying subscribers by June 2027 ($9,990 MRR)", solo: false, who: "Full team", tool: "Financials" },
+        ],
+        calendar: "Apr 1 - Jun 30 2027",
+        doNotTouch: null,
+      },
+      {
+        week: "Jun - Nov 2027",
+        dates: "Jun - Nov 2027",
+        focus: "Breakeven and seed prep",
+        tasks: [
+          { task: "Breakeven at 1,789 subscribers - target November 2027", solo: false, who: "Full team", tool: "Financials" },
+          { task: "Begin seed round preparation - $2M-$5M target", solo: true, tool: "Roadmap" },
+          { task: "B2B licensing conversations - contingent on Phase 2 and Phase 3 validation", solo: true, tool: "Roadmap" },
+          { task: "Target: 2,000 subscribers ($19,980 MRR) by December 2027 for seed round", solo: false, who: "Full team", tool: "Financials" },
+        ],
+        calendar: "Jun 1 - Nov 30 2027",
+        doNotTouch: null,
+      },
     ],
-    benchmarks: "2026 median seed: $2M-$4M raise. Median pre-money: $16M. Fewer than 10% of pre-seed startups reach seed. Bar: real revenue, proven retention, clear growth path.",
-  },
-  {
-    id: "seriesa",
-    label: "Series A",
-    sublabel: "2028-2029",
-    status: "future",
-    target: "$10M-$20M",
-    valuation: "$30M-$60M pre-money",
-    instrument: "Series A preferred",
-    dilution: "20-25%",
-    gamma: {
-      goal: "Scale to $1M ARR. Build B2B licensing revenue. Expand dataset to 10K+ users.",
-      milestone: "$1M ARR. B2B deal signed. International expansion started.",
-      gate: "Gated on seed round success and $1M ARR milestone.",
-    },
-    what: "Institutional VCs leading $10M-$20M rounds. Lead investor takes a board seat. Full due diligence: financials, IP audit, customer interviews, technical review. Process takes 3-6 months.",
-    instrument_detail: "Series A preferred stock with full investor rights: liquidation preference, anti-dilution, pro-rata, information rights, board representation. Legal fees $50K-$100K. Requires audited financials and clean cap table.",
-    investors: [
-      { name: "Top-tier health tech VCs", description: "GV (Google Ventures), Andreessen Horowitz, General Catalyst, Bessemer." },
-      { name: "Strategic acquirers via CVC", description: "Oura, Apple, Garmin, Whoop corporate venture arms." },
-      { name: "Growth-stage health funds", description: "Foresite Capital, RA Capital, Deerfield Management." },
+    gaps: [
+      { gap: "Growth and paid acquisition", solo: false, who: "Growth hire or performance marketing agency", how: "Funded by pre-seed. CAC target $20 in Year 2. Do not open paid channels before pre-seed closes." },
+      { gap: "B2B licensing model", solo: false, who: "Business development hire or Mia leading research partnerships", how: "Contingent on Phase 2 and Phase 3 data. Cannot sell B2B without cross-person generalization proof." },
+      { gap: "Seed round lead investor", solo: false, who: "Tier 1 health tech VC", how: "Rock Health, GV, General Catalyst, Andreessen Bio. Need $1M+ ARR and proven retention before approaching." },
     ],
-    sources: [
-      { label: "Series A benchmarks 2026", url: "https://www.pitchwise.se/blog/the-complete-guide-to-seed-and-series-funding-rounds-for-founders-in-2026" },
-      { label: "Foundersuite investor database", url: "https://foundersuite.com" },
-      { label: "Crunchbase investor search", url: "https://www.crunchbase.com/lists/investors" },
-    ],
-    benchmarks: "2026 typical Series A: $10M-$20M, median $12M. Pre-money $25M-$50M, median $45M. Fewer than 5% of seed companies raise Series A.",
-  },
-  {
-    id: "nondilutive",
-    label: "Non-dilutive",
-    sublabel: "Apply at every stage",
-    status: "parallel",
-    target: "Varies",
-    valuation: "No dilution",
-    instrument: "Grants and credits",
-    dilution: "0%",
-    gamma: {
-      goal: "Reduce how much equity you sell at every stage. Every grant dollar is a dollar you do not need to raise.",
-      milestone: "NVIDIA Inception applied. EU Horizon grant researched. Portugal IAPMEI programs researched.",
-      gate: "No gate. Apply now and at every subsequent stage.",
-    },
-    what: "Grants, accelerator programs, R&D tax credits, GPU credits, and prize competitions. Zero equity given away. Every dollar of grant funding reduces your dilution at the next round.",
-    instrument_detail: "Non-dilutive funding does not appear on your cap table. It reduces burn and extends runway. The more runway you have, the better your negotiating position at every priced round.",
-    investors: [
-      { name: "NVIDIA Inception", description: "Free to apply. GPU credits, VC network via Inception Capital Connect." },
-      { name: "EU Horizon EIC Accelerator", description: "Up to EUR 2.5M non-dilutive for deep tech startups." },
-      { name: "Portugal IAPMEI", description: "Portuguese government innovation grants for Portugal-based startups." },
-      { name: "Wellcome Trust", description: "Global health research funder. Relevant for cognitive health research." },
-    ],
-    sources: [
-      { label: "NVIDIA Inception program", url: "https://www.nvidia.com/en-us/startups/" },
-      { label: "EIC Accelerator (EU)", url: "https://eic.ec.europa.eu/eic-funding/eic-accelerator_en" },
-      { label: "Wellcome Trust grants", url: "https://wellcome.org/grant-funding" },
-      { label: "IAPMEI Portugal", url: "https://www.iapmei.pt" },
-    ],
-    benchmarks: "Non-dilutive funding is the best money available. NVIDIA Inception takes 2 hours to apply. EIC Accelerator gives up to EUR 2.5M non-dilutive to deep tech startups.",
   },
 ]
 
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-primary text-primary-foreground",
-  next: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  upcoming: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   future: "bg-muted text-muted-foreground",
-  parallel: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  active: "Active now",
-  next: "Next",
-  future: "Future",
-  parallel: "Apply at every stage",
+function makeCalendarUrl(title: string, dates: string): string {
+  const base = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+  const text = encodeURIComponent("Gamma Sprint: " + title)
+  const details = encodeURIComponent("Gamma Master Sprint - " + title + " (" + dates + ")")
+  return base + "&text=" + text + "&details=" + details
 }
 
-export default function RoadmapPage() {
-  const [activeStage, setActiveStage] = useState("ff")
-  const stage = STAGES.find((s) => s.id === activeStage)!
+export default function SprintPage() {
+  const [activePhase, setActivePhase] = useState("ff")
+  const [activeView, setActiveView] = useState<"weeks" | "gaps">("weeks")
+  const [expandedWeek, setExpandedWeek] = useState<string | null>(null)
+
+  const phase = PHASES.find((p) => p.id === activePhase)!
 
   return (
     <main className="mx-auto min-h-svh w-full max-w-3xl px-5 py-10 sm:px-6">
       <header className="mb-8">
-        <h1 className="text-lg font-semibold tracking-tight text-foreground">Founder funding roadmap</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Every stage from F&F to Series A. What you need, when you need it, and who to talk to.</p>
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">Master Sprint</h1>
+        <p className="mt-1 text-sm text-muted-foreground">End-to-end execution plan. Solo founder. Every week, every gap, every handoff.</p>
       </header>
 
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-        {STAGES.map((s) => (
-          <button key={s.id} onClick={() => setActiveStage(s.id)} className={"flex-shrink-0 flex flex-col items-start px-3 py-2 rounded-lg border transition-colors " + (activeStage === s.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted")}>
-            <span className="text-xs font-medium text-foreground">{s.label}</span>
-            <span className="text-[11px] text-muted-foreground mt-0.5">{s.sublabel}</span>
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {PHASES.map((p) => (
+          <button key={p.id} onClick={() => { setActivePhase(p.id); setExpandedWeek(null) }} className={"flex-shrink-0 flex flex-col items-start px-3 py-2 rounded-lg border transition-colors " + (activePhase === p.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted")}>
+            <span className="text-xs font-medium text-foreground">{p.label}</span>
+            <span className="text-[11px] text-muted-foreground mt-0.5">{p.sublabel}</span>
           </button>
         ))}
       </div>
 
-      <div className="space-y-5">
-
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div>
-              <p className="text-sm font-medium text-foreground">{stage.label} round</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stage.sublabel}</p>
-            </div>
-            <span className={"text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 " + STATUS_COLORS[stage.status]}>{STATUS_LABELS[stage.status]}</span>
+      <div className="rounded-xl border border-border bg-card p-5 mb-6">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">{phase.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{phase.sublabel}</p>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { label: "Target raise", value: stage.target },
-              { label: "Valuation", value: stage.valuation },
-              { label: "Instrument", value: stage.instrument },
-              { label: "Dilution", value: stage.dilution },
-            ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg bg-muted p-2.5">
-                <p className="text-[11px] text-muted-foreground mb-0.5">{label}</p>
-                <p className="text-xs font-medium text-foreground">{value}</p>
-              </div>
-            ))}
-          </div>
+          <span className={"text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 " + STATUS_COLORS[phase.status]}>{phase.status === "active" ? "Active now" : phase.status === "upcoming" ? "Upcoming" : "Future"}</span>
         </div>
-
-        <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
-          <p className="text-xs font-medium text-primary mb-3">Gamma - this stage</p>
-          <div className="space-y-2">
-            {[
-              { label: "Goal", value: stage.gamma.goal },
-              { label: "Milestone", value: stage.gamma.milestone },
-              { label: "Gate", value: stage.gamma.gate },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-start gap-2">
-                <span className="text-[11px] font-medium text-foreground shrink-0 min-w-[60px] mt-0.5">{label}</span>
-                <span className="text-xs text-muted-foreground leading-relaxed">{value}</span>
-              </div>
-            ))}
-          </div>
+        <p className="text-xs text-muted-foreground leading-relaxed mb-2">{phase.goal}</p>
+        <p className="text-[11px] text-muted-foreground/60 leading-relaxed mb-3">{phase.confirmed}</p>
+        <div className="flex flex-wrap gap-2">
+          {phase.links.map((link) => (
+            <a key={link.label} href={link.href} className="text-[11px] font-medium px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+              {link.label} -&gt;
+            </a>
+          ))}
         </div>
+      </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Who invests at this stage</p>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-4">{stage.what}</p>
-          <div className="space-y-2">
-            {stage.investors.map((inv) => (
-              <div key={inv.name} className="flex items-start gap-2.5">
-                <span className="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+      <div className="flex gap-1 mb-6 border-b border-border pb-3">
+        {(["weeks", "gaps"] as const).map((v) => (
+          <button key={v} onClick={() => setActiveView(v)} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (activeView === v ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
+            {v === "weeks" ? "Week by week" : "Gaps and handoffs"}
+          </button>
+        ))}
+      </div>
+
+      {activeView === "weeks" && (
+        <div className="space-y-3">
+          {phase.weeks.map((week) => (
+            <div key={week.week} className={"rounded-xl border bg-card transition-colors " + (expandedWeek === week.week ? "border-primary" : "border-border")}>
+              <div className="flex items-center justify-between p-4 cursor-pointer" onClick={() => setExpandedWeek(expandedWeek === week.week ? null : week.week)}>
                 <div>
-                  <span className="text-xs font-medium text-foreground">{inv.name} </span>
-                  <span className="text-xs text-muted-foreground">{inv.description}</span>
+                  <p className="text-xs font-medium text-foreground">{week.week} - {week.focus}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{week.dates}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a href={makeCalendarUrl(week.week + " " + week.focus, week.dates)} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[11px] font-medium px-2 py-1 rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">
+                    + Calendar
+                  </a>
+                  <span className="text-xs text-muted-foreground">{expandedWeek === week.week ? "^" : "v"}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Instrument details</p>
-          <p className="text-xs text-muted-foreground leading-relaxed">{stage.instrument_detail}</p>
-        </div>
+              {expandedWeek === week.week && (
+                <div className="border-t border-border px-4 pb-4 pt-3 space-y-4">
+                  <div className="space-y-2">
+                    {week.tasks.map((task, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className={"size-4 rounded shrink-0 mt-0.5 border " + (task.solo ? "border-primary/40 bg-primary/5" : "border-amber-400/40 bg-amber-50 dark:bg-amber-950")} />
+                        <div className="flex-1">
+                          <p className="text-xs text-foreground leading-relaxed">{task.task}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {task.solo ? (
+                              <span className="text-[11px] text-primary">Solo</span>
+                            ) : (
+                              <span className="text-[11px] text-amber-700 dark:text-amber-400">Needs: {"who" in task ? task.who : "help"}</span>
+                            )}
+                            {"tool" in task && task.tool && (
+                              <a href={"/" + task.tool.toLowerCase().replace(/ > .*/, "").replace(/ /g, "")} className="text-[11px] text-muted-foreground/60 hover:text-primary transition-colors">{task.tool}</a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">2026 benchmarks</p>
-          <p className="text-xs text-muted-foreground leading-relaxed">{stage.benchmarks}</p>
+                  {week.doNotTouch && (
+                    <div className="rounded-lg bg-destructive/10 text-destructive p-3 text-xs leading-relaxed">
+                      Do not: {week.doNotTouch}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
+      )}
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Sources and links</p>
-          <div className="space-y-2">
-            {stage.sources.map((src) => (
-              <a key={src.label} href={src.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-primary hover:underline">
-                <i className="ti ti-external-link" style={{ fontSize: 13 }} aria-hidden />
-                {src.label}
-              </a>
-            ))}
-          </div>
+      {activeView === "gaps" && (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Every task you cannot do alone. Who you need, and how to get them.</p>
+          {phase.gaps.map((gap, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-5">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <p className="text-sm font-medium text-foreground">{gap.gap}</p>
+                <span className={"text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 " + (gap.solo ? "bg-primary/10 text-primary" : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200")}>{gap.solo ? "Solo" : "Needs help"}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-2">Who: {gap.who}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{gap.how}</p>
+            </div>
+          ))}
         </div>
-
-      </div>
+      )}
     </main>
   )
 }

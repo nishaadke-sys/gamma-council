@@ -7,6 +7,7 @@ import { AGENTS, MODES, getMode, type ModeId } from "@/lib/council"
 import { useDebate } from "@/hooks/use-debate"
 import { CouncilRoster } from "@/components/council-roster"
 import { AgentTurnCard } from "@/components/agent-turn-card"
+import { DebateHistory } from "@/components/debate-history"
 
 const LIVE_CONTEXT_KEY = "gamma-council:live-context"
 
@@ -28,7 +29,9 @@ export default function Page() {
   const [liveContext, setLiveContext] = useState("")
   const [contextOpen, setContextOpen] = useState(false)
   const [injection, setInjection] = useState("")
+  const [tab, setTab] = useState<"council" | "history">("council")
   const bottomRef = useRef<HTMLDivElement>(null)
+  const savedRef = useRef(false)
   const { turns, running, error, run, reset, injectFacilitator, sessionCost } = useDebate()
 
   const activeMode = getMode(mode)
@@ -61,8 +64,32 @@ export default function Page() {
 
   function handleRun() {
     if (!canRun) return
+    savedRef.current = false
     run({ topic: topic.trim(), mode, perspective, rounds, liveContext })
   }
+
+  // Persist each completed debate (topic + verdict + transcript) to Postgres so
+  // it shows up under the History tab. Fires whenever the run is finished AND a
+  // done verdict exists -- not on a fragile running->false transition edge,
+  // which could miss the save if the verdict was still "thinking" at that exact
+  // render. savedRef (reset in handleRun) makes it idempotent (saves once).
+  useEffect(() => {
+    if (running || savedRef.current) return
+    const verdict = turns.find((t) => t.agentId === "verdict" && t.status === "done")
+    if (!verdict || !topic.trim()) return
+    savedRef.current = true
+    fetch("/api/debates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: topic.trim(),
+        verdict: verdict.content,
+        mode,
+        perspective,
+        turns: turns.map((t) => ({ agentId: t.agentId, round: t.round, content: t.content })),
+      }),
+    }).catch((e) => console.error("debate save failed", e))
+  }, [running, turns, topic, mode, perspective])
 
   function handleInject() {
     if (!injection.trim()) return
@@ -95,8 +122,27 @@ export default function Page() {
         <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted-foreground text-pretty">
           Six AI minds, each on a different model. They debate your question and address each other directly.
         </p>
+
+        <div className="mt-4 flex rounded-lg border border-border overflow-hidden w-fit">
+          {(["council", "history"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`px-4 py-1.5 text-xs font-medium capitalize transition-colors ${
+                tab === t
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background text-muted-foreground hover:bg-muted"
+              } ${t === "history" ? "border-l border-border" : ""}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </header>
 
+      {tab === "council" && (
+        <>
       <section className="mb-6">
         <CouncilRoster />
       </section>
@@ -247,7 +293,14 @@ export default function Page() {
             {running ? "Council in session..." : started ? "Convene again" : "Convene the council"}
           </Button>
           {started && !running && (
-            <Button variant="ghost" size="lg" onClick={reset}>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => {
+                reset()
+                setTopic("")
+              }}
+            >
               <RotateCcw className="size-4" />
               Clear
             </Button>
@@ -329,6 +382,10 @@ export default function Page() {
           </div>
         </div>
       )}
+        </>
+      )}
+
+      {tab === "history" && <DebateHistory />}
     </main>
   )
 }

@@ -242,7 +242,8 @@ type FlagItem = { type: string; text: string }
 
 export default function FundingPage() {
   const [perspective, setPerspective] = useState<"founder" | "investor">("founder")
-  const [tab, setTab] = useState<"calculator" | "scenarios" | "definitions" | "playbook">("calculator")
+  const [tab, setTab] = useState<"calculator" | "scenarios" | "definitions" | "playbook" | "financials">("calculator")
+  const [instrument, setInstrument] = useState<"note" | "safe">("note")
   const [raise, setRaise] = useState(150000)
   const [cap, setCap] = useState(3000000)
   const [discount, setDiscount] = useState(0)
@@ -306,6 +307,100 @@ export default function FundingPage() {
 
   const flags = perspective === "founder" ? founderFlags : investorFlags
 
+  // Dynamic instrument T&C. Live slider values are baked into each answer so the
+  // plain-English explanation always reflects the current deal on screen.
+  const accruedInterest = d.accrued - raise
+  const safeOwnership = (raise / cap) * 100
+  const pctI = d.investorOwnership.toFixed(2) + "%"
+  const pctS = safeOwnership.toFixed(2) + "%"
+
+  type Term = { q: string; when: string; a: string; founder: string; investor: string }
+
+  const noteTerms: Term[] = [
+    {
+      q: "What happens at maturity?",
+      when: `Gamma has not raised a priced round by month ${months}.`,
+      a: `If no round in ${months} months, the investor can demand ${fmt(d.accrued)} back.`,
+      founder: `Raise or owe ${fmt(d.accrued)}`,
+      investor: `Safety valve, not a plan`,
+    },
+    {
+      q: "What happens to the interest?",
+      when: `At every point from now until conversion or repayment.`,
+      a: `Interest accrues at ${interest}%/yr, adding ${fmt(accruedInterest)} over ${months} months.`,
+      founder: `Extra dilution, not cash`,
+      investor: `More shares at conversion`,
+    },
+    {
+      q: "What happens to your equity?",
+      when: `Gamma raises its next priced round at any valuation.`,
+      a: `Your ${fmt(d.accrued)} converts to about ${pctI} at the ${fmt(cap)} cap.`,
+      founder: `Debt becomes ~${pctI} equity`,
+      investor: `Cap locks in ~${pctI}`,
+    },
+    {
+      q: "When does the founder pay back?",
+      when: `You are deciding whether to invest in a note vs a SAFE.`,
+      a: `Only if ${months} months pass with no round, otherwise never.`,
+      founder: `Almost never repaid`,
+      investor: `Backstop, not your return`,
+    },
+    {
+      q: "What happens in a down round?",
+      when: `Gamma's next round prices below the ${fmt(cap)} cap.`,
+      a: `You convert at the ${fmt(cap)} cap or the round price, whichever is lower.`,
+      founder: `You absorb the dilution`,
+      investor: `Protected, never worse than cap`,
+    },
+    {
+      q: "What if the company shuts down?",
+      when: `Gamma winds down before raising a priced round.`,
+      a: `Note holders are paid after secured creditors, before shareholders.`,
+      founder: `Ranks ahead of your equity`,
+      investor: `Above equity, behind banks`,
+    },
+  ]
+
+  const safeTerms: Term[] = [
+    {
+      q: "What happens if no priced round ever happens?",
+      when: `Gamma never raises institutional money.`,
+      a: `No maturity date - your ${fmt(raise)} stays locked as a promise of future shares with no deadline and no repayment.`,
+      founder: `no debt, but no deadline either`,
+      investor: `money frozen until a round happens`,
+    },
+    {
+      q: "What happens to your equity?",
+      when: `Gamma raises its next priced round at any valuation.`,
+      a: `Your ${fmt(raise)} converts to ${pctS} of the company at the ${fmt(cap)} post-money cap, fixed regardless of the next round price.`,
+      founder: `${pctS} - clean, no surprises`,
+      investor: `your slice is locked in now`,
+    },
+    {
+      q: "When does the founder pay it back?",
+      when: `You are comparing a SAFE to a convertible note.`,
+      a: `Never. A SAFE is not a loan - no repayment obligation under any circumstances.`,
+      founder: `zero repayment risk, ever`,
+      investor: `cash back is not your return path`,
+    },
+    {
+      q: "What happens in a down round?",
+      when: `Gamma's next round prices below the ${fmt(cap)} cap.`,
+      a: `Your SAFE converts at the ${fmt(cap)} cap regardless - giving you more shares than new investors if the round prices lower.`,
+      founder: `more dilution in a down round`,
+      investor: `down round works in your favor`,
+    },
+    {
+      q: "What happens if the company shuts down?",
+      when: `Gamma winds down before raising a priced round.`,
+      a: `SAFE holders are not creditors - you stand with equity and almost always recover nothing in a shutdown.`,
+      founder: `no creditor claim against you`,
+      investor: `no debt claim - shutdown returns zero`,
+    },
+  ]
+
+  const instrumentTerms = instrument === "note" ? noteTerms : safeTerms
+
   return (
     <main className="mx-auto min-h-svh w-full max-w-3xl px-5 py-10 sm:px-6">
       <header className="mb-8">
@@ -322,7 +417,7 @@ export default function FundingPage() {
       </div>
 
       <div className="flex gap-1 mb-6 border-b border-border pb-3">
-        {(["calculator", "scenarios", "definitions", "playbook"] as const).map((t) => (
+        {(["calculator", "scenarios", "definitions", "playbook", "financials"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (tab === t ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
             {t}
           </button>
@@ -346,6 +441,50 @@ export default function FundingPage() {
                   <span className="text-xs text-muted-foreground min-w-[160px]">{label}</span>
                   <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => set(+e.target.value)} className="flex-1" />
                   <span className="text-xs font-medium text-foreground min-w-[56px] text-right">{display}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Instrument terms</p>
+              <div className="flex rounded-lg border border-border overflow-hidden">
+                {([
+                  { id: "note", label: "Convertible Note" },
+                  { id: "safe", label: "SAFE" },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setInstrument(opt.id)}
+                    className={"px-3 py-1.5 text-xs font-medium transition-colors " + (instrument === opt.id ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted")}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+              {instrument === "note"
+                ? "A convertible note is a loan that turns into shares. It has interest and a maturity date. The answers below reflect your current sliders."
+                : "A SAFE is a promise of future shares, no loan, no interest, no deadline. The answers below reflect your current sliders."}
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {instrumentTerms.map((t) => (
+                <div key={t.q} className="rounded-xl border border-border bg-card p-4 flex flex-col">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">{t.q}</p>
+                  <p className="text-[11px] italic text-muted-foreground/70 leading-snug mb-2">When this matters: {t.when}</p>
+                  <p className="text-sm text-foreground leading-snug mb-3 flex-1">{t.a}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] leading-none text-primary">
+                      <span className="font-semibold">Founder</span>
+                      <span className="opacity-80">{t.founder}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-green-600/10 px-2.5 py-1 text-[11px] leading-none text-green-700 dark:text-green-400">
+                      <span className="font-semibold">Investor</span>
+                      <span className="opacity-80">{t.investor}</span>
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -706,6 +845,199 @@ export default function FundingPage() {
                   <p className="text-xs text-muted-foreground leading-relaxed">{text}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {tab === "financials" && (
+        <div className="space-y-10">
+          <p className="text-xs text-muted-foreground leading-relaxed">Verified, locked figures. Exact numbers, no rounding, no estimates. Year 1 begins April 2027, Year 2 begins April 2028.</p>
+
+          {/* 1. Revenue model */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">1. Revenue model</p>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {[
+                { label: "Subscription price", value: "$9.99 / month", sub: "Single tier, per subscriber" },
+                { label: "COGS Year 1", value: "33%", sub: "App Store 30% + infrastructure 3%" },
+                { label: "COGS Year 2", value: "30%", sub: "Retained subscribers qualify for 15% App Store fee after 12 months" },
+                { label: "Gross margin Year 1", value: "67%", sub: "" },
+                { label: "Gross margin Year 2", value: "70%", sub: "" },
+              ].map(({ label, value, sub }) => (
+                <div key={label} className="flex items-start justify-between gap-4 p-4">
+                  <div>
+                    <p className="text-xs font-medium text-foreground">{label}</p>
+                    {sub && <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub}</p>}
+                  </div>
+                  <p className="text-sm font-medium text-foreground shrink-0">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Monthly expenses */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">2. Monthly expenses</p>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {[
+                { label: "Founder salary", value: "$4,000 / mo", sub: "" },
+                { label: "Technical contractor", value: "$3,000 / mo", sub: "" },
+                { label: "Mia consulting", value: "$559 / mo", sub: "$26/hr x 5hrs/week x 4.3 weeks" },
+                { label: "People total", value: "$7,559 / mo", sub: "$90,708 / year", strong: true },
+                { label: "Operations", value: "$1,062 / mo", sub: "Legal, LLM, tools, Startups.com, SendGrid, Xolo, Apple Dev, $12,744 / year" },
+                { label: "Total fixed OpEx", value: "$8,621 / mo", sub: "$103,452 / year", strong: true },
+              ].map(({ label, value, sub, strong }) => (
+                <div key={label} className={"flex items-start justify-between gap-4 p-4 " + (strong ? "bg-muted/40" : "")}>
+                  <div>
+                    <p className="text-xs font-medium text-foreground">{label}</p>
+                    {sub && <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub}</p>}
+                  </div>
+                  <p className="text-sm font-medium text-foreground shrink-0">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Annual financials table */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">3. Annual financials</p>
+            <div className="rounded-xl border border-border bg-card p-5 overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left font-medium text-muted-foreground pb-2 pr-3">Line item</th>
+                    <th className="text-right font-medium text-muted-foreground pb-2 px-2">Year 1<br /><span className="font-normal text-muted-foreground/60">Apr 2027</span></th>
+                    <th className="text-right font-medium text-muted-foreground pb-2 pl-2">Year 2<br /><span className="font-normal text-muted-foreground/60">Apr 2028</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { item: "MRR target", y1: "$9,990", y2: "$39,960" },
+                    { item: "Annual revenue", y1: "$119,880", y2: "$479,520", strong: true },
+                    { item: "Subscribers", y1: "1,000", y2: "4,000" },
+                    { item: "COGS", y1: "$39,560", y2: "$143,856" },
+                    { item: "Gross profit", y1: "$80,320", y2: "$335,664", strong: true },
+                    { item: "Gross margin", y1: "67%", y2: "70%" },
+                    { item: "People", y1: "$90,708", y2: "$90,708" },
+                    { item: "Operations", y1: "$12,744", y2: "$12,744" },
+                    { item: "Acquisition", y1: "$15,000", y2: "$60,000" },
+                    { item: "Research", y1: "$19,498", y2: "$14,240" },
+                    { item: "IP registration", y1: "$5,700", y2: "$13,000" },
+                    { item: "Total expenses", y1: "$183,210", y2: "$334,548", strong: true },
+                  ].map(({ item, y1, y2, strong }) => (
+                    <tr key={item} className="border-b border-border/60">
+                      <td className={"py-2 pr-3 " + (strong ? "font-medium text-foreground" : "text-muted-foreground")}>{item}</td>
+                      <td className={"py-2 px-2 text-right tabular-nums " + (strong ? "font-medium text-foreground" : "text-foreground")}>{y1}</td>
+                      <td className={"py-2 pl-2 text-right tabular-nums " + (strong ? "font-medium text-foreground" : "text-foreground")}>{y2}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-b border-border/60">
+                    <td className="py-2.5 pr-3 font-semibold text-foreground">Net</td>
+                    <td className="py-2.5 px-2 text-right tabular-nums font-semibold text-destructive">-$63,330</td>
+                    <td className="py-2.5 pl-2 text-right tabular-nums font-semibold text-green-700 dark:text-green-400">+$144,972</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 pr-3 font-semibold text-foreground">Margin</td>
+                    <td className="py-2.5 px-2 text-right tabular-nums font-semibold text-destructive">-53%</td>
+                    <td className="py-2.5 pl-2 text-right tabular-nums font-semibold text-green-700 dark:text-green-400">+30%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 4. CAC and LTV */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">4. CAC and LTV</p>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              {[
+                { label: "CAC Year 1", value: "$15", sub: "$15,000 / 1,000 subscribers" },
+                { label: "CAC Year 2", value: "$20", sub: "$60,000 / 3,000 new subscribers" },
+                { label: "LTV at 12 months", value: "$80.32", sub: "$9.99 x 12 x 67% margin" },
+                { label: "LTV at 24 months", value: "$160.64", sub: "$9.99 x 24 x 67% margin" },
+              ].map(({ label, value, sub }) => (
+                <div key={label} className="rounded-xl border border-border bg-card p-4">
+                  <p className="text-[11px] text-muted-foreground mb-1">{label}</p>
+                  <p className="text-lg font-medium text-foreground">{value}</p>
+                  <p className="text-[11px] text-muted-foreground/70 mt-0.5 leading-relaxed">{sub}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {[
+                { label: "LTV/CAC Year 1 at 12 months", value: "5.4x", good: true },
+                { label: "LTV/CAC Year 1 at 24 months", value: "10.7x", good: true },
+                { label: "CAC payback Year 1", value: "2.2 months", good: false },
+                { label: "CAC payback Year 2", value: "3.0 months", good: false },
+              ].map(({ label, value, good }) => (
+                <div key={label} className="flex items-center justify-between gap-4 p-4">
+                  <p className="text-xs font-medium text-foreground">{label}</p>
+                  <p className={"text-sm font-medium shrink-0 " + (good ? "text-green-700 dark:text-green-400" : "text-foreground")}>{value}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground/70 mt-3 leading-relaxed">Benchmark: a healthy SaaS LTV/CAC ratio is 3x or above. Both years clear it comfortably.</p>
+          </div>
+
+          {/* 5. Runway analysis */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">5. Runway analysis</p>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {[
+                { label: "F&F raise", value: "$150,000" },
+                { label: "Pre-launch burn to October 2026", value: "$7,470" },
+                { label: "Remaining at launch", value: "$142,530", strong: true },
+                { label: "Monthly burn post-launch", value: "$11,971" },
+                { label: "Runway from launch", value: "11.9 months", strong: true },
+                { label: "Runway exhaustion", value: "~ October 2027" },
+                { label: "Pre-seed closes", value: "April 2027", sub: "6 months before runway exhaustion" },
+                { label: "Buffer at pre-seed close", value: "6 months", sub: "of runway remaining", good: true },
+              ].map(({ label, value, sub, strong, good }) => (
+                <div key={label} className={"flex items-start justify-between gap-4 p-4 " + (strong ? "bg-muted/40" : "")}>
+                  <div>
+                    <p className="text-xs font-medium text-foreground">{label}</p>
+                    {sub && <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub}</p>}
+                  </div>
+                  <p className={"text-sm font-medium shrink-0 " + (good ? "text-green-700 dark:text-green-400" : "text-foreground")}>{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. MRR milestone timeline */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">6. MRR milestone timeline</p>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="relative pl-6">
+                <span className="absolute left-[7px] top-1 bottom-1 w-px bg-border" aria-hidden />
+                {[
+                  { date: "Oct 2026", title: "App Store launch", detail: "20 subscribers · $200 MRR" },
+                  { date: "Dec 2026", title: "Pre-seed conversations open", detail: "100 subscribers · $999 MRR" },
+                  { date: "Feb 2027", title: "Pre-seed pipeline active", detail: "300 subscribers · $2,997 MRR" },
+                  { date: "Apr 2027", title: "Pre-seed closes", detail: "$500K raised", raise: true },
+                  { date: "Jun 2027", title: "Year 1 target", detail: "1,000 subscribers · $9,990 MRR" },
+                  { date: "Nov 2027", title: "Breakeven", detail: "1,789 subscribers · $17,876 MRR", breakeven: true },
+                  { date: "Dec 2027", title: "Seed round preparation", detail: "2,000 subscribers · $19,980 MRR" },
+                  { date: "May 2028", title: "Year 2 target, 30% margin", detail: "4,000 subscribers · $39,960 MRR" },
+                ].map(({ date, title, detail, breakeven, raise }) => (
+                  <div key={date} className="relative pb-5 last:pb-0">
+                    <span
+                      className={"absolute -left-[22px] top-1 size-3.5 rounded-full border-2 border-card " + (breakeven ? "bg-green-600" : raise ? "bg-primary" : "bg-muted-foreground/40")}
+                      aria-hidden
+                    />
+                    <div className={breakeven ? "rounded-lg bg-green-50 dark:bg-green-950 px-3 py-2 -ml-1" : ""}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs font-medium text-foreground">{date}</p>
+                        <p className={"text-xs font-medium " + (breakeven ? "text-green-700 dark:text-green-400" : "text-foreground")}>{title}</p>
+                        {breakeven && <span className="text-[10px] font-semibold uppercase tracking-wide text-green-700 dark:text-green-400 rounded-full bg-green-600/15 px-2 py-0.5">Breakeven</span>}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

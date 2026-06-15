@@ -87,6 +87,7 @@ export default function Page() {
         mode,
         perspective,
         turns: turns.map((t) => ({ agentId: t.agentId, round: t.round, content: t.content })),
+        costTotal: totalCost,
       }),
     }).catch((e) => console.error("debate save failed", e))
   }, [running, turns, topic, mode, perspective])

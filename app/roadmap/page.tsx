@@ -378,6 +378,30 @@ export default function SprintPage() {
         <p className="mt-1 text-sm text-muted-foreground">End-to-end execution plan. Solo founder. Every week, every gap, every handoff.</p>
       </header>
 
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 mb-6">
+        <p className="text-xs font-medium text-primary mb-3">Where you are in the journey</p>
+        <div className="space-y-2">
+          {[
+            { stage: "FFF", label: "Friends, Family and Fools", desc: "Earliest round from personal network before any validation.", status: "active" },
+            { stage: "FPF", label: "Founder Product Fit", desc: "The founder has built something that solves a problem they personally understand deeply.", status: "active" },
+            { stage: "PSF", label: "Problem Solution Fit", desc: "The problem is real and the solution addresses it. The 223ms finding and Oura discordance data puts you here.", status: "active" },
+            { stage: "FMF", label: "Founder Market Fit", desc: "The founder is uniquely positioned to win in this market. EY background plus live EEG platform built solo in 90 days.", status: "active" },
+            { stage: "PMF", label: "Product Market Fit", desc: "Paying customers using the product repeatedly. Working toward this with Phase 2 and App Store launch.", status: "next" },
+            { stage: "BMF", label: "Business Model Fit", desc: "Repeatable, scalable revenue. The $9.99 SaaS model with verified unit economics is the path.", status: "future" },
+            { stage: "FIF", label: "Founder Investor Fit", desc: "The right investors believe in you specifically. The F&F round and pre-seed conversations live here.", status: "future" },
+          ].map(({ stage, label, desc, status }) => (
+            <div key={stage} className="flex items-start gap-3">
+              <span className={"text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 mt-0.5 " + (status === "active" ? "bg-primary text-primary-foreground" : status === "next" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" : "bg-muted text-muted-foreground")}>{stage}</span>
+              <div>
+                <p className={"text-xs font-medium " + (status === "active" ? "text-foreground" : "text-muted-foreground")}>{label}</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-primary/70 mt-3 pt-3 border-t border-primary/20">You are between FPF and PSF, moving toward FMF. The F&F raise funds the journey from PSF to PMF.</p>
+      </div>
+
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         {PHASES.map((p) => (
           <button key={p.id} onClick={() => { setActivePhase(p.id); setExpandedWeek(null) }} className={"flex-shrink-0 flex flex-col items-start px-3 py-2 rounded-lg border transition-colors " + (activePhase === p.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted")}>

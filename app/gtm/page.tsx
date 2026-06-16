@@ -97,7 +97,7 @@ const ICP = [
 
 export default function GTMPage() {
   const [expanded, setExpanded] = useState<string | null>(null)
-  const [view, setView] = useState<"channels" | "icp" | "metrics">("channels")
+  const [view, setView] = useState<"channels" | "icp" | "metrics" | "journey">("channels")
 
   return (
     <main className="mx-auto min-h-svh w-full max-w-3xl px-5 py-10 sm:px-6">
@@ -107,9 +107,9 @@ export default function GTMPage() {
       </header>
 
       <div className="flex gap-1 mb-6 border-b border-border pb-3">
-        {(["channels", "icp", "metrics"] as const).map(v => (
+        {(["channels", "icp", "metrics", "journey"] as const).map(v => (
           <button key={v} onClick={() => setView(v)} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (view === v ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
-            {v === "icp" ? "ICP" : v === "metrics" ? "Kill metrics" : "Channels"}
+            {v === "icp" ? "ICP" : v === "metrics" ? "Kill metrics" : v === "journey" ? "User journey" : "Channels"}
           </button>
         ))}
       </div>
@@ -185,6 +185,73 @@ export default function GTMPage() {
           </div>
         </div>
       )}
+
+      {view === "journey" && (
+        <div className="space-y-4">
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">The 5-stage user journey for Gamma. Growth happens when you identify friction faster than users leave.</p>
+
+          {[
+            {
+              stage: "1. Discover",
+              sub: "They find you",
+              color: "border-primary/30 bg-primary/5",
+              label_color: "text-primary",
+              how: "Oura discordance hook on social - 75% disagreement stat drives organic sharing. Muse affiliate program via Ariel Garten. Clinical referrals through Mia's network at Brainstim and Xiberlinc. Phase 2 participants as first word-of-mouth.",
+              friction: null,
+            },
+            {
+              stage: "2. Try",
+              sub: "They give it a chance",
+              color: "border-border bg-card",
+              label_color: "text-foreground",
+              how: "21-day free trial. Frictionless onboarding: connect existing wearable, run first 6-minute EEG session, get first CCS score. Phase 2 participants already primed - they have 14 days of their own data.",
+              friction: "They don't see the value: if the first score feels random or unexplained, they drop off. Fix: milestone-unlocked insight at session 1 that explains what their score means and what affects it.",
+            },
+            {
+              stage: "3. Use",
+              sub: "They get value",
+              color: "border-border bg-card",
+              label_color: "text-foreground",
+              how: "Daily CCS check before high-stakes work. Milestone-unlocked insights: first unlock at session 5, full set at session 14. The score starts correlating with how the day actually feels - that is the moment of value.",
+              friction: "The value isn't enough: score feels generic, not personalized. Fix: longitudinal patterns unlock at session 30 - brain peaks at 6pm, 10.8 points above weekly average. The longer they use it the sharper it gets.",
+            },
+            {
+              stage: "4. Return",
+              sub: "They come back",
+              color: "border-border bg-card",
+              label_color: "text-foreground",
+              how: "Data lock-in: accuracy improves with every session. Users who reach session 30 have a personalized model - they cannot get that elsewhere. Daily habit formed around checking CCS before calendar decisions.",
+              friction: "They don't come back: habit not formed, score check feels optional. Fix: morning push notification showing yesterday's CCS vs today's. Make the delta visible daily.",
+            },
+            {
+              stage: "5. Recommend",
+              sub: "They tell others",
+              color: "border-green-200/50 bg-green-50/50 dark:bg-green-950/20",
+              label_color: "text-green-700 dark:text-green-400",
+              how: "High CCS day screenshots shared organically. Discordance moments - Oura says ready, Gamma says not - are naturally shareable. Phase 2 participants referring colleagues before App Store launch.",
+              friction: null,
+            },
+          ].map(({ stage, sub, color, label_color, how, friction }) => (
+            <div key={stage} className={"rounded-xl border p-5 " + color}>
+              <p className={"text-xs font-medium mb-0.5 " + label_color}>{stage}</p>
+              <p className="text-[11px] text-muted-foreground mb-3">{sub}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-3">{how}</p>
+              {friction && (
+                <div className="rounded-lg bg-destructive/10 text-destructive p-3 text-xs leading-relaxed">
+                  {friction}
+                </div>
+              )}
+            </div>
+          ))}
+
+          <div className="rounded-xl border border-border bg-card p-4 mt-2">
+            <p className="text-xs font-medium text-foreground mb-1">Key insight from PostHog</p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">Growth happens when you identify friction faster than users leave.</p>
+            <p className="text-xs text-muted-foreground leading-relaxed mt-2">For Gamma: the two friction points are Try-to-Use (score feels random) and Use-to-Return (habit not formed). Both are solved by the milestone-unlocked insight system - sessions 1, 5, 14, 30, 90.</p>
+          </div>
+        </div>
+      )}
+
     </main>
   )
 }

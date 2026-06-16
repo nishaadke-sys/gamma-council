@@ -183,6 +183,28 @@ export default function GTMPage() {
             <p className="text-xs font-medium text-foreground mb-2">North star metric</p>
             <p className="text-xs text-muted-foreground leading-relaxed">1,000 paying subscribers by June 2027 at $9.99/month = $9,990 MRR. This is the pre-seed gate. Every channel decision should be evaluated against its contribution to this number.</p>
           </div>
+
+          <div className="rounded-xl border border-border bg-card p-4 mt-2">
+            <p className="text-xs font-medium text-foreground mb-1">What success actually looks like</p>
+            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">Many startups track dozens of metrics but few clearly indicate if the business is creating value. Revenue is the destination. These metrics tell you if you are headed there.</p>
+            <div className="space-y-2">
+              {[
+                { stage: "Activation", metric: "User delivers first complete EEG session and receives CCS score", target: "80% of signups complete session 1" },
+                { stage: "Product reliability", metric: "Signal quality above 50% and session completion without error", target: "90% of sessions complete without BLE dropout" },
+                { stage: "Feature adoption", metric: "User reaches milestone unlocks at sessions 5, 14, and 30", target: "40% of activated users reach session 14" },
+                { stage: "Retention", metric: "Monthly active users and day-30 retention rate", target: "60% day-30 retention. Industry benchmark for health apps is 30%" },
+                { stage: "Revenue", metric: "$9.99/month paying subscribers after 21-day trial", target: "1,000 subscribers by June 2027 = $9,990 MRR" },
+              ].map(({ stage, metric, target }) => (
+                <div key={stage} className="flex items-start gap-3 py-2 border-b border-border last:border-0">
+                  <span className="text-[11px] font-medium text-primary shrink-0 min-w-[120px] mt-0.5">{stage}</span>
+                  <div>
+                    <p className="text-xs text-foreground leading-relaxed">{metric}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Target: {target}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

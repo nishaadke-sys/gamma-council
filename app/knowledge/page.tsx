@@ -1,7 +1,7 @@
 "use client"
 
-
 import { useEffect, useState, useRef } from "react"
+import posthog from "posthog-js"
 import { Plus, Trash2, Upload, ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -61,9 +61,15 @@ export default function KnowledgePage() {
     })
     const data = await res.json()
     if (data.success) {
+      posthog.capture("knowledge_document_uploaded", {
+        filename: file.name,
+        entries_extracted: data.count,
+        file_size_bytes: file.size,
+      })
       setUploadStatus(`Extracted ${data.count} entries from ${file.name}`)
       loadEntries()
     } else {
+      posthog.captureException(new Error("Knowledge upload failed: " + (data.error || "unknown error")))
       setUploadStatus("Upload failed: " + (data.error || "unknown error"))
     }
     setUploading(false)
@@ -71,6 +77,11 @@ export default function KnowledgePage() {
   }
 
   async function deleteEntry(id: number) {
+    const entry = entries.find((e) => e.id === id)
+    posthog.capture("knowledge_entry_deleted", {
+      entry_id: id,
+      section: entry?.section,
+    })
     await fetch("/api/knowledge", {
       method: "DELETE",
       headers: { "content-type": "application/json" },

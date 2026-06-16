@@ -1,7 +1,7 @@
 "use client"
 
-
 import { useState } from "react"
+import posthog from "posthog-js"
 
 function fmt(n: number, type = "dollar"): string {
   if (type === "dollar") {
@@ -418,7 +418,10 @@ export default function FundingPage() {
 
       <div className="flex gap-1 mb-6 border-b border-border pb-3">
         {(["calculator", "scenarios", "definitions", "playbook", "financials"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (tab === t ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
+          <button key={t} onClick={() => {
+            posthog.capture("funding_tab_viewed", { tab: t, perspective })
+            setTab(t)
+          }} className={"px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize " + (tab === t ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
             {t}
           </button>
         ))}

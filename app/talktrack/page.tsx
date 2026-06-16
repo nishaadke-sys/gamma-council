@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 
 const SCRIPT = [
   { id: "opening", title: "Opening (30 seconds)", script: "Hey [name], I wanted to reach out because I am building something I think you will find interesting and I would love 15 minutes to share it. No pressure either way. When works for you?", note: "Keep it short. Do not pitch over text or email. Get the call." },
@@ -54,7 +55,12 @@ export default function TalkTrackPage() {
           </div>
 
           {SCRIPT.map((s) => (
-            <div key={s.id} className={"rounded-xl border bg-card p-5 cursor-pointer transition-colors " + (expanded === s.id ? "border-primary" : "border-border")} onClick={() => setExpanded(expanded === s.id ? null : s.id)}>
+            <div key={s.id} className={"rounded-xl border bg-card p-5 cursor-pointer transition-colors " + (expanded === s.id ? "border-primary" : "border-border")} onClick={() => {
+              if (expanded !== s.id) {
+                posthog.capture("talk_track_section_expanded", { section_id: s.id, section_title: s.title, tab })
+              }
+              setExpanded(expanded === s.id ? null : s.id)
+            }}>
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-2">{s.title}</p>
               <p className="text-sm text-foreground leading-relaxed">{s.script}</p>
               {expanded === s.id && (
@@ -71,7 +77,12 @@ export default function TalkTrackPage() {
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground mb-4">Tap any objection to see the response.</p>
           {OBJECTIONS.map((obj, i) => (
-            <div key={i} className={"rounded-xl border bg-card p-4 cursor-pointer transition-colors " + (expanded === String(i) ? "border-primary" : "border-border")} onClick={() => setExpanded(expanded === String(i) ? null : String(i))}>
+            <div key={i} className={"rounded-xl border bg-card p-4 cursor-pointer transition-colors " + (expanded === String(i) ? "border-primary" : "border-border")} onClick={() => {
+              if (expanded !== String(i)) {
+                posthog.capture("talk_track_section_expanded", { section_id: String(i), section_title: obj.q, tab })
+              }
+              setExpanded(expanded === String(i) ? null : String(i))
+            }}>
               <p className="text-sm font-medium text-foreground">{obj.q}</p>
               {expanded === String(i) && (
                 <div className="mt-3 space-y-2.5">

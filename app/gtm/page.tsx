@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 
 const CHANNELS = [
   {
@@ -117,7 +118,17 @@ export default function GTMPage() {
       {view === "channels" && (
         <div className="space-y-3">
           {CHANNELS.map(ch => (
-            <div key={ch.id} className={"rounded-xl border bg-card cursor-pointer transition-colors " + (expanded === ch.id ? "border-primary" : "border-border")} onClick={() => setExpanded(expanded === ch.id ? null : ch.id)}>
+            <div key={ch.id} className={"rounded-xl border bg-card cursor-pointer transition-colors " + (expanded === ch.id ? "border-primary" : "border-border")} onClick={() => {
+              if (expanded !== ch.id) {
+                posthog.capture("gtm_channel_expanded", {
+                  channel_id: ch.id,
+                  channel_name: ch.name,
+                  channel_status: ch.status,
+                  channel_stage: ch.stage,
+                })
+              }
+              setExpanded(expanded === ch.id ? null : ch.id)
+            }}>
               <div className="p-4">
                 <div className="flex items-start justify-between gap-3 mb-1">
                   <div className="flex items-center gap-2">

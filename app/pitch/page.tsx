@@ -1,7 +1,7 @@
 "use client"
 
-
 import { useState } from "react"
+import posthog from "posthog-js"
 
 const QUESTIONS = [
   { id: "q1", category: "Traction", difficulty: "high", question: "You have 81 sessions from 3 subjects. Why should I believe this validates anything?", ideal: "You are right that 3 subjects is not statistical proof. What it is is a within-person longitudinal dataset that no competitor has. The 223ms Stroop delta held consistently across 20 paired sessions, not one lucky measurement. Phase 2 starts June 21 with 30 participants across two cohorts specifically to answer your question - cross-person generalization. The $150K F&F funds exactly that. I am not asking you to believe N=3 proves the market. I am asking you to believe the founder built a working platform, validated the measurement within-person, and has a funded plan to prove it across people.", tips: "Do not get defensive. Acknowledge the limitation clearly, then reframe it as depth not weakness. Lead with the Phase 2 plan immediately." },
@@ -34,6 +34,10 @@ export default function PitchPage() {
   const filtered = category === "All" ? QUESTIONS : QUESTIONS.filter(q => q.category === category)
 
   function startDrill() {
+    posthog.capture("pitch_drill_started", {
+      category: category,
+      question_count: filtered.length,
+    })
     setMode("drill")
     setDrillIndex(0)
     setShowAnswer(false)
@@ -46,6 +50,10 @@ export default function PitchPage() {
       setShowAnswer(false)
       setUserAnswer("")
     } else {
+      posthog.capture("pitch_drill_completed", {
+        category: category,
+        question_count: filtered.length,
+      })
       setMode("browse")
     }
   }
@@ -126,7 +134,16 @@ export default function PitchPage() {
             <div>
               <p className="text-[11px] font-medium text-muted-foreground mb-2">Your answer</p>
               <textarea value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)} rows={5} placeholder="Answer out loud first, then type the key points here..." className="w-full rounded-xl border border-border bg-background px-4 py-3 text-xs text-foreground resize-none focus:outline-none focus:ring-1 focus:ring-primary" />
-              <button onClick={() => setShowAnswer(true)} className="w-full mt-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium py-2.5 hover:bg-primary/90 transition-colors">
+              <button onClick={() => {
+                posthog.capture("pitch_drill_answer_revealed", {
+                  question_id: current.id,
+                  category: current.category,
+                  difficulty: current.difficulty,
+                  drill_index: drillIndex,
+                  wrote_answer: userAnswer.trim().length > 0,
+                })
+                setShowAnswer(true)
+              }} className="w-full mt-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium py-2.5 hover:bg-primary/90 transition-colors">
                 Show ideal answer
               </button>
             </div>

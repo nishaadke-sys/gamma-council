@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Pool } from "pg"
+import { getPostHogClient } from "@/lib/posthog-server"
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -49,6 +50,22 @@ export async function POST(req: NextRequest) {
       "INSERT INTO debates (topic, verdict, mode, perspective, turns, cost_total) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at",
       [topic, verdict || null, mode || null, perspective || null, JSON.stringify(turns || []), typeof costTotal === "number" ? costTotal : null]
     )
+
+    const distinctId = req.headers.get("x-posthog-distinct-id") ?? "anonymous"
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId,
+      event: "debate_saved",
+      properties: {
+        debate_id: result.rows[0].id,
+        mode: mode || null,
+        perspective: perspective || null,
+        turns_count: Array.isArray(turns) ? turns.length : 0,
+        cost_total: typeof costTotal === "number" ? costTotal : null,
+        topic_length: topic.length,
+      },
+    })
+
     return NextResponse.json({ ok: true, debate: result.rows[0] })
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 })

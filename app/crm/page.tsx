@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 
 const INVESTORS = [
   { id: "saurabh", name: "Saurabh", amount: 10000, location: "US", status: "verbal", priority: 1, notes: "$10K confirmed. Sent financials - waiting to see if he goes higher. Most important active conversation.", compliance: "US wire - straightforward", lastContact: "", nextAction: "Follow up on financials review" },
@@ -41,11 +42,24 @@ export default function CRMPage() {
   const signed = investors.filter(i => ["signed", "wired", "closed"].includes(i.status)).reduce((s, i) => s + i.amount, 0)
 
   function updateStatus(id: string, status: string) {
+    const investor = investors.find(i => i.id === id)
+    posthog.capture("investor_status_updated", {
+      investor_id: id,
+      investor_location: investor?.location,
+      previous_status: investor?.status,
+      new_status: status,
+    })
     setInvestors(prev => prev.map(i => i.id === id ? { ...i, status } : i))
   }
 
   function saveEdits(id: string) {
     if (edits[id]) {
+      const investor = investors.find(i => i.id === id)
+      posthog.capture("investor_notes_saved", {
+        investor_id: id,
+        investor_status: investor?.status,
+        fields_updated: Object.keys(edits[id]),
+      })
       setInvestors(prev => prev.map(i => i.id === id ? { ...i, ...edits[id] } : i))
     }
     setSelected(null)

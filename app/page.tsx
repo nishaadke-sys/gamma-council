@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import posthog from "posthog-js"
 import { Play, RotateCcw, ChevronDown, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AGENTS, MODES, getMode, type ModeId } from "@/lib/council"
@@ -65,6 +66,13 @@ export default function Page() {
   function handleRun() {
     if (!canRun) return
     savedRef.current = false
+    posthog.capture("council_convened", {
+      mode,
+      perspective,
+      rounds,
+      topic_length: topic.trim().length,
+      has_live_context: liveContext.trim().length > 0,
+    })
     run({ topic: topic.trim(), mode, perspective, rounds, liveContext })
   }
 
@@ -80,7 +88,10 @@ export default function Page() {
     savedRef.current = true
     fetch("/api/debates", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-posthog-distinct-id": posthog.get_distinct_id(),
+      },
       body: JSON.stringify({
         topic: topic.trim(),
         verdict: verdict.content,
@@ -94,6 +105,11 @@ export default function Page() {
 
   function handleInject() {
     if (!injection.trim()) return
+    posthog.capture("council_injection_sent", {
+      injection_length: injection.trim().length,
+      mode,
+      turns_count: turns.length,
+    })
     injectFacilitator(injection.trim())
     setInjection("")
   }
@@ -298,6 +314,12 @@ export default function Page() {
               variant="ghost"
               size="lg"
               onClick={() => {
+                posthog.capture("council_cleared", {
+                  mode,
+                  perspective,
+                  turns_count: turns.length,
+                  session_cost: totalCost,
+                })
                 reset()
                 setTopic("")
               }}

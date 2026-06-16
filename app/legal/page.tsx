@@ -24,6 +24,17 @@ const SECTIONS = [
     ],
   },
   {
+    id: "attorney",
+    title: "Attorney guidance - Mark Underwood",
+    content: [
+      { heading: "Custom note package - multi-jurisdiction round", body: "Mark's direction: because the F&F round spans three jurisdictions (US, EU, India), a single off-the-shelf template is not sufficient. A custom note package is required to handle the cross-border structure correctly across all three investor groups. Do not reuse one unchanged SAFE template across US, EU, and India investors for this round.", status: "action" },
+      { heading: "Reg D analysis and Form D filing", body: "A Regulation D analysis is required, and a Form D must be filed with the SEC once the first investor commits. Treat the first signed commitment as the trigger - the Form D clock starts then, not at the close of the full round. Do not let the first wire land without this filed.", status: "action" },
+      { heading: "India investor - compliance gated", body: "The India investor is compliance-gated. Do not move or accept funds until the Authorized Dealer (AD) bank confirms the LRS (Liberalised Remittance Scheme) path. No transfer happens before that written confirmation, regardless of any verbal commitment.", status: "action" },
+      { heading: "GDPR review before study start", body: "A GDPR review must be completed before the June 21 Phase 2 study start. This is a hard gate - participant data collection should not begin until the review is signed off.", status: "action" },
+      { heading: "Engagement structure and schedules", body: "Engagement is fixed-fee, not retainer. Schedule A covers the F&F close deliverables, due by July 15. Schedule B covers the GDPR pack, due by June 20.", status: "action" },
+    ],
+  },
+  {
     id: "entities",
     title: "Now - entity structure",
     content: [

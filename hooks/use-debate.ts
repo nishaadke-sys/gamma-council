@@ -206,7 +206,7 @@ export function useDebate() {
           "claude-sonnet-4-5",
           buildVerdictSystem(liveContext),
           [{ role: "user", content: `Topic: ${topic}\n\nDebate transcript:\n${transcript}\n\nDeliver the verdict.` }],
-          700,
+          4000,
         )
         const verdictText = cleanText(raw)
         setTurns((prev) =>
